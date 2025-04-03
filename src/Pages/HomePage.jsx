@@ -37,7 +37,7 @@ const HomePage = React.memo(() => {
   };
 
   return (
-    <main className="bg-gradient-to-b from-[#00CED1] to-white min-h-screen p-12">
+    <main className="bg-gradient-to-b from-[#00CED1] via-white to-white min-h-screen p-12">
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
