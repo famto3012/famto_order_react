@@ -1,50 +1,43 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import BASE_URL from "../../BaseURL";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import BASE_URL from "../../BaseURL";
 
-const Home_Delivery = (React.memo = () => {
-  const [token, setToken] = useState("");
-  const [allBusinessCategory, setAllBusinessCategory] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+const Home_Delivery = React.memo = (() => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const token = localStorage.getItem("authToken");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCategories = async () => {
       try {
-        setIsLoading(true);
-
-        navigator.geolocation.getCurrentPosition(
-          async ({ coords: { latitude, longitude } }) => {
-            const response = await axios.post(
-              `${BASE_URL}/customers/all-business-categories`, // Use the base URL
-              { latitude, longitude },
-              {
-                withCredentials: true,
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            );
-
-            if (response.status === 200) {
-              setAllBusinessCategory(response.data.data || []);
-              console.log("Data:", response.data.data);
-            }
-          },
-          (error) => console.error("Error fetching location:", error.message)
+        setLoading(true);
+        const { data, status } = await axios.post(
+          `${BASE_URL}/customers/all-business-categories`,
+          { latitude: 8.495721, longitude: 76.995264 },
+          { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
         );
+        if (status === 200) setCategories(data.data || []);
       } catch (err) {
-        console.error(`Error in fetching data ${err.message}`);
+        console.error("Error fetching categories:", err.message);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchData();
+    fetchCategories();
   }, [token]);
+
+  const handleCategoryClick = (id, title) => {
+    navigate("/merchants", { state: { businessCategoryId: id, token, category: title } });
+  };
 
   return (
     <main className="w-full min-h-screen flex flex-col items-center justify-start p-4">
-      <motion.section
-        className="w-full max-w-7xl bg-[#0d0d1f] rounded-2xl shadow-lg md:mt-12 justify-center items-end overflow-hidden md:flex relative"
+       <motion.section
+        className="w-full max-w-[85rem] bg-[#0d0d1f] rounded-2xl shadow-lg md:mt-12 justify-center items-end overflow-hidden md:flex relative"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 2.5, ease: "easeInOut" }}
@@ -106,43 +99,31 @@ const Home_Delivery = (React.memo = () => {
           </div>
         </div>
       </motion.section>
+
+      {/* Category List */}
       <div className="mt-10 text-2xl font-semibold">Select Category</div>
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-12 mt-5 justify-center items-center place-items-center"
+        className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-5 place-items-center"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
       >
-        {Array.isArray(allBusinessCategory) &&
-          allBusinessCategory.map((category, index) => (
-            <motion.div
-              key={index}
-              className="w-60 flex-shrink-0 rounded-2xl hover:shadow-2xl border border-teal-300 shadow-lg overflow-hidden bg-[#00CED1]"
-              whileHover={{ scale: 1.085 }}
-              whileTap={{ scale: 0.95 }}
-              // initial={{ opacity: 0, y: 20 }}
-              // animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.0 }}
-            >
-              <img
-                src={category.bannerImageURL}
-                alt={category.name}
-                className="w-4/5 h-50 object-cover rounded-b-full mx-auto"
-                initial={{ scale: 1.9 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0 }}
-              />
-              <div
-                className="bg-teal-800 text-white p-3"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0 }}
-              >
-                <h3 className="font-semibold text-center">{category.title}</h3>
-              </div>
-            </motion.div>
-          ))}
-      </motion.div>   
+        {categories.map(({ id, title, bannerImageURL }) => (
+          <motion.div
+            key={id}
+            className="w-60 rounded-2xl hover:shadow-2xl border border-teal-300 shadow-lg bg-[#00CED1] cursor-pointer"
+            whileHover={{ scale: 1.085 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleCategoryClick(id, title)}
+            transition={{ duration: 0.5 }}
+          >
+            <img src={bannerImageURL} alt={title} className="w-4/5 h-50 object-cover rounded-b-full mx-auto" />
+            <div className="bg-black text-white p-3 rounded-b-2xl">
+              <h3 className="font-semibold text-center">{title}</h3>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
     </main>
   );
 });
