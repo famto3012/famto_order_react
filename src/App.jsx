@@ -3,6 +3,9 @@ import "./App.css";
 import HomePage from "./Pages/HomePage";
 import Pick_Drop from "./Pages/PickAndDrop/Pick_Drop";
 import Home_Delivery from "./Pages/Universal_Flow/Home_Delivery";
+import Checkout from "./Pages/Components/Checkout";
+import MerchantLists from "./Pages/Universal_Flow/MerchantLists";
+import LoginPage from "./Pages/Components/LoginPage";
 
 function App() {
   return(
@@ -10,7 +13,10 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/pick-drop" element={<Pick_Drop />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="/home-delivery" element={<Home_Delivery />} />
+      <Route path="/merchants" element={<MerchantLists />} />
+      <Route path="/login" element={<LoginPage />} />
     </Routes>
     </BrowserRouter>
   )

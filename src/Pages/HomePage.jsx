@@ -37,7 +37,7 @@ const HomePage = React.memo(() => {
   };
 
   return (
-    <main className="bg-gradient-to-b from-[#00CED1] to-white min-h-screen p-12">
+    <main className="bg-gradient-to-b from-[#00CED1] via-white to-white min-h-screen p-12">
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ const HomePage = React.memo(() => {
           />
         </div>
         {/* <Lottie animationData={burgerAnimation} className="w-10 h-10"/> */}
-        <button className="px-4 py-2 rounded-lg bg-white  text-black shadow-md hover:bg-gray-100">
+        <button className="px-4 py-2 rounded-lg bg-white  text-black shadow-md hover:bg-gray-100" onClick={navigate('/login')}>
           Login
         </button>
       </header>
@@ -64,7 +64,7 @@ const HomePage = React.memo(() => {
               variants={text1Variants}
               transition={{ duration: 0.1 }}
             >
-              <h1 className="font-[500] text-[#00ced1] text-[14px] md:text-[26px] bg-gradient-to-r to-black from-[#008080] bg-clip-text text-transparent">
+              <h1 className="font-[500] text-[#00CED1] text-[14px] md:text-[26px] bg-gradient-to-r to-black from-[#008080] bg-clip-text text-transparent">
                 Explore our fast and reliable delivery services
               </h1>
             </motion.div>
