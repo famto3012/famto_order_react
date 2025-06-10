@@ -6,6 +6,7 @@ import Home_Delivery from "./Pages/Universal_Flow/Home_Delivery";
 import Checkout from "./Pages/Components/Checkout";
 import MerchantLists from "./Pages/Universal_Flow/MerchantLists";
 import LoginPage from "./Pages/Components/LoginPage";
+import ProductList from "./Pages/Universal_Flow/ProductList";
 
 function App() {
   return(
@@ -17,6 +18,7 @@ function App() {
       <Route path="/home-delivery" element={<Home_Delivery />} />
       <Route path="/merchants" element={<MerchantLists />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/products" element={<ProductList />} />
     </Routes>
     </BrowserRouter>
   )
