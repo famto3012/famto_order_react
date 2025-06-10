@@ -1,8 +1,8 @@
 // src/components/MerchantLists/MerchantLists.jsx
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchMerchantsByCategory } from "../../services/merchantService.js";
-import "../../styles/merchantStyles.css";
+import { fetchMerchantsByCategory } from "../../services/Universal_Flow/merchantService.js";
+import "../../styles/Universal_Flow/merchantStyles.css";
 
 const MerchantLists = React.memo = (() => {
   const { state } = useLocation();
@@ -39,15 +39,16 @@ const MerchantLists = React.memo = (() => {
             <p className="text-center col-span-full text-gray-500">No merchants found.</p>
           ) : (
             merchantList.map((merchant, index) => (
-              <div key={index} className="card" onClick={() => navigate("/products")}>
+              <div key={index} className="card" onClick={() => navigate("/products", { state: { merchantId: merchant.id } })}
+              >
                 <img
-                  src={merchant.merchantImageURL || "public/order/empty_merchant.png"}
+                  src={merchant.merchantImageURL || "order/empty_merchant.png"}
                   alt={merchant.merchantName}
                   className="cardImage"
-                   onError={(e) => {
-                e.target.onerror = null; // prevent infinite loop
-                e.target.src = "public/order/empty_merchant.png";
-              }}
+                  onError={(e) => {
+                    e.target.onerror = null; // prevent infinite loop
+                    e.target.src = "order/empty_merchant.png";
+                  }}
                 />
                 <div className="cardContent">
                   <div className="cardTitle">

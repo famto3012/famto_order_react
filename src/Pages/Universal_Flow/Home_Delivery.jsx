@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import "../../styles/universalStyles.css";
-import { fetchCategories } from "../../services/universalService";
+import "../../styles/Universal_Flow/universalStyles.css";
+import { fetchCategories } from "../../services/Universal_Flow/universalService";
 
 const Home_Delivery = React.memo = (() => {
   const [categories, setCategories] = useState([]);
@@ -13,7 +13,7 @@ const Home_Delivery = React.memo = (() => {
   useEffect(() => {
     const loadCategories = async () => {
       setLoading(true);
-      try {
+      try { 
         const fetched = await fetchCategories(token);
         setCategories(fetched);
       } catch (err) {
@@ -115,12 +115,12 @@ const Home_Delivery = React.memo = (() => {
             transition={{ duration: 0.5 }}
           >
             <img
-              src={bannerImageURL || "public/order/empty_category.jpg"}
+              src={bannerImageURL || "order/empty_category.jpg"}
               alt={title}
               className="w-4/5 h-50 object-cover rounded-b-full mx-auto"
               onError={(e) => {
                 e.target.onerror = null; // prevent infinite loop
-                e.target.src = "public/order/empty_category.jpg";
+                e.target.src = "order/empty_category.jpg";
               }}
             />
 

@@ -1,5 +1,6 @@
 import axios from "axios";
-import BASE_URL from "../BaseURL";
+import BASE_URL from "../../BaseURL";
+
 
 export const fetchCategories = async (token) => {
   const { data, status } = await axios.post(
@@ -10,3 +11,15 @@ export const fetchCategories = async (token) => {
   if (status === 200) return data.data || [];
   return [];
 };
+
+export const fetchMerchantCategories = async() => {
+  const data = await axios.get(`${BASE_URL}/customers/category`, {
+    params : {
+      merchantId,
+      businessCategoryId,
+      page,
+      limit
+    };
+    if(status === 200) return data.data || [];
+  })
+}
