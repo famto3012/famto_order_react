@@ -30,13 +30,12 @@ const LoginPage = React.memo = (() => {
       const data = response.data;
 
       // Store token in local storage
-      if (data.token) {
         localStorage.setItem("authToken", data.token);
-      }
+     navigate(-1);
   
       // Handle success - save token or redirect
       alert("Login successful!",data.success);
-      navigate(-1);
+     
     } catch (err) {
       setError(err.response?.data?.message || "Failed to login. Please try again.");
     } finally {

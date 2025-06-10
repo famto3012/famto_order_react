@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import BASE_URL from "../../BaseURL";
+import "../../styles/universalStyles.css";
+import { fetchCategories } from "../../services/universalService";
 
 const Home_Delivery = React.memo = (() => {
   const [categories, setCategories] = useState([]);
@@ -11,33 +11,30 @@ const Home_Delivery = React.memo = (() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const { data, status } = await axios.post(
-          `${BASE_URL}/customers/all-business-categories`,
-          { latitude: 8.495721, longitude: 76.995264 },
-          { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
-        );
-        if (status === 200) setCategories(data.data || []);
+        const fetched = await fetchCategories(token);
+        setCategories(fetched);
       } catch (err) {
-        console.error("Error fetching categories:", err.message);
+        console.error("Error loading categories", err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCategories();
+    loadCategories();
   }, [token]);
+
 
   const handleCategoryClick = (id, title) => {
     navigate("/merchants", { state: { businessCategoryId: id, token, category: title } });
   };
 
   return (
-    <main className="w-full min-h-screen flex flex-col items-center justify-start p-4">
-       <motion.section
-        className="w-full max-w-[85rem] bg-[#0d0d1f] rounded-2xl shadow-lg md:mt-12 justify-center items-end overflow-hidden md:flex relative"
+    <main className="w-full min
+    -h-screen flex flex-col items-center justify-start p-4">
+      <motion.section
+        className="home-banner"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 2.5, ease: "easeInOut" }}
@@ -103,7 +100,7 @@ const Home_Delivery = React.memo = (() => {
       {/* Category List */}
       <div className="mt-10 text-2xl font-semibold">Select Category</div>
       <motion.div
-        className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-5 place-items-center"
+        className="category-grid"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
@@ -111,13 +108,22 @@ const Home_Delivery = React.memo = (() => {
         {categories.map(({ id, title, bannerImageURL }) => (
           <motion.div
             key={id}
-            className="w-60 rounded-2xl hover:shadow-2xl border border-teal-300 shadow-lg bg-[#00CED1] cursor-pointer"
+            className="category-card"
             whileHover={{ scale: 1.085 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleCategoryClick(id, title)}
             transition={{ duration: 0.5 }}
           >
-            <img src={bannerImageURL} alt={title} className="w-4/5 h-50 object-cover rounded-b-full mx-auto" />
+            <img
+              src={bannerImageURL || "public/order/empty_category.jpg"}
+              alt={title}
+              className="w-4/5 h-50 object-cover rounded-b-full mx-auto"
+              onError={(e) => {
+                e.target.onerror = null; // prevent infinite loop
+                e.target.src = "public/order/empty_category.jpg";
+              }}
+            />
+
             <div className="bg-black text-white p-3 rounded-b-2xl">
               <h3 className="font-semibold text-center">{title}</h3>
             </div>

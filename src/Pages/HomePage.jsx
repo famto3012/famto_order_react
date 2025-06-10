@@ -48,9 +48,13 @@ const HomePage = React.memo(() => {
           />
         </div>
         {/* <Lottie animationData={burgerAnimation} className="w-10 h-10"/> */}
-        <button className="px-4 py-2 rounded-lg bg-white  text-black shadow-md hover:bg-gray-100" onClick={navigate('/login')}>
-          Login
-        </button>
+       <button
+  className="px-4 py-2 rounded-lg bg-white text-black shadow-md hover:bg-gray-100"
+  onClick={() => navigate('/login')}  // ✅ This delays execution until click
+>
+  Login
+</button>
+
       </header>
 
       <div style={{ textAlign: "center", marginTop: "10px" , minHeight: "120px"}}>
