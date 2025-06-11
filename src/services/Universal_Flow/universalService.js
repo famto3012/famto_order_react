@@ -12,14 +12,29 @@ export const fetchCategories = async (token) => {
   return [];
 };
 
-export const fetchMerchantCategories = async() => {
+export const fetchMerchantCategories = async(merchantId,businessCategoryId,page,limit) => {
   const data = await axios.get(`${BASE_URL}/customers/category`, {
     params : {
       merchantId,
       businessCategoryId,
       page,
       limit
-    };
-    if(status === 200) return data.data || [];
-  })
+    },
+    withCredentials : true
+  });
+  console.log("Merchant Categories :",data.data);
+  return data.data || [];
+}
+
+export const fetchProducts = async(categoryId,page,limit) => {
+  const data = await axios.get(`${BASE_URL}/customers/products`,{
+    params:{
+      categoryId,
+      page,
+      limit
+    },
+    withCredentials: true
+  });
+  console.log("Products",data.data);
+  return data.data || [];
 }

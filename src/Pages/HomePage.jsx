@@ -11,7 +11,7 @@ import {
   animate,
 } from "framer-motion";
 
-const HomePage = React.memo(() => {
+const HomePage = () => {
   const navigate = useNavigate();
 
   const [showFirst, setShowFirst] = useState(true);
@@ -173,7 +173,7 @@ const HomePage = React.memo(() => {
       </section>
     </main>
   );
-});
+};
 
 HomePage.displayName = "HomePage";
 

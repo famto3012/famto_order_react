@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { fetchMerchantsByCategory } from "../../services/Universal_Flow/merchantService.js";
 import "../../styles/Universal_Flow/merchantStyles.css";
 
-const MerchantLists = React.memo = (() => {
+const MerchantLists = () => {
   const { state } = useLocation();
   const { businessCategoryId, category } = state || {};
   const [merchantList, setMerchantList] = useState([]);
@@ -39,7 +39,7 @@ const MerchantLists = React.memo = (() => {
             <p className="text-center col-span-full text-gray-500">No merchants found.</p>
           ) : (
             merchantList.map((merchant, index) => (
-              <div key={index} className="card" onClick={() => navigate("/products", { state: { merchantId: merchant.id } })}
+              <div key={index} className="card" onClick={() => navigate("/products", { state: { merchantId: merchant.id ,businessCategoryId :businessCategoryId} })}
               >
                 <img
                   src={merchant.merchantImageURL || "order/empty_merchant.png"}
@@ -66,8 +66,6 @@ const MerchantLists = React.memo = (() => {
       )}
     </div>
   );
-}
-);
+};
 
-MerchantLists.displayName = "MerchantLists";
 export default MerchantLists;
