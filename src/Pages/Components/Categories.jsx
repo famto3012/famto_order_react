@@ -10,12 +10,12 @@ const categories = [
   { name: "Personal Items", image: "/order/personal_items.png" },
   { name: "Gifts & Flowers", image: "/order/gift_flowers.jpeg" },
   { name: "Electronics", image: "/order/electronics.jpg" },
-  { name: "Household items", image: "/order/household.jpg" },
+  // { name: "Household items", image: "/order/household.jpg" },
   { name: "Books & Stationary", image: "/order/books_stationery.jpg" },
   { name: "Online Orders", image: "/order/online_orders.jpg" },
   { name: "Pet Supplies", image: "/order/pet_supplies.jpg" },
   { name: "Automotive Parts", image: "/order/automative_parts.jpg" },
-  { name: "Others", image: "/order/delivery_boys.png" },
+  { name: "Others", image: "/order/household.jpg" },
 ];
 
 export default function CategoryGrid({ onSavePackage }) { 
@@ -60,7 +60,7 @@ export default function CategoryGrid({ onSavePackage }) {
 
 
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-5 gap-6">
+    <div className="max-w-6xl mx-auto md:grid grid-cols-4 gap-6">
       {categories.map((category, index) => (
         <motion.div
           key={index}
@@ -69,7 +69,7 @@ export default function CategoryGrid({ onSavePackage }) {
           transition={{ duration: 0.3 }}
         >
           <Card
-            sx={{ borderRadius: "30px", boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)" }}
+            sx={{ width: "250px",borderRadius: "30px", boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)" }}
             className="text-center shadow-2xl cursor-pointer"
             onClick={() => handleOpen(index)}
           >
@@ -83,14 +83,6 @@ export default function CategoryGrid({ onSavePackage }) {
               />
               <p className="mt-4 font-semibold text-[14px]">{category.name}</p>
             </CardContent>
-
-            {/* {savedData[index] && (
-              <div className="mt-2 text-sm text-gray-700">
-                <p>📦 Quantity: {savedData[index].quantity}</p>
-                <p>📏 Dimensions: {savedData[index].length} x {savedData[index].width} x {savedData[index].height} cm</p>
-                <p>⚖️ Weight: {savedData[index].weight} kg</p>
-              </div>
-            )} */}
           </Card>
         </motion.div>
       ))}
