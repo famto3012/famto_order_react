@@ -1,6 +1,7 @@
 import axios from "axios";
 import BASE_URL from "../../BaseURL";
 
+
 export const fetchMerchantsByCategory = async (businessCategoryId, token, latitude, longitude) => {
   try {
     const response = await axios.get(`${BASE_URL}/customers/filter-and-search-merchants`, {
@@ -40,5 +41,27 @@ export const fetchMerchantData = async (merchantId) => {
 
   } catch (error) {
     console.log("Merchant data failed :", error.response.data || error.message);
+  }
+  
+}
+
+export const toggleMerchantFavourite = async (merchantId,businessCategoryId) => {
+    const token = localStorage.getItem("authToken");
+    console.log("Token",token);
+  try {
+    const data = await axios.patch(`${BASE_URL}/customers/toggle-merchant-favorite/${merchantId}/${businessCategoryId}`,
+      {},
+      {
+        withCredentials: true,
+        headers:{
+          Authorization : `Bearer ${token}`,
+        }
+      }
+
+    );
+    console.log("Favourite Merchant", data);
+    return data.data || [];
+  } catch (error) {
+
   }
 }
