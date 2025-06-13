@@ -1,198 +1,140 @@
-// import React, { useEffect, useState } from "react";
-// import { fetchMerchantData } from "../../services/Universal_Flow/merchantService";
-// import { useLocation } from "react-router-dom";
-// import "../../styles/Universal_Flow/merchantStyles.css";
-// import { fetchMerchantCategories } from "../../services/Universal_Flow/universalService";
-
-// const ProductList = React.memo = (() => {
-
-//     const { state } = useLocation();
-//     const merchantId = state?.merchantId;
-//     const businessCategoryId = state?.businessCategoryId;
-//     const [merchant, setMerchant] = useState({});
-//     const [categories, setCategories] = useState([]);
-
-//     useEffect(() => {
-//         const loadInitialData = async () => {
-//             try {
-//                 // 1. Fetch merchant data
-//                 const merchantData = await fetchMerchantData(merchantId);
-//                 console.log("Merchant", merchantData);
-//                 setMerchant(merchantData);
-
-//                 // 2. Fetch merchant categories
-//                 const categoryData = await fetchMerchantCategories(merchantId, businessCategoryId, 1, 200);
-//                 console.log("Merchant Categories", categoryData);
-//                 setCategories(categoryData || []);
-//             } catch (error) {
-//                 console.error("Failed to load initial data:", error);
-//             }
-//         };
-//         loadInitialData();
-//     }, [merchantId]);
-
-//     return (
-//         <>
-//             <main>
-//                 Product List
-//                 <div className="card"
-//                 >
-//                     <img
-//                         src={merchant.merchantImage || "order/empty_merchant.png"}
-//                         alt={merchant.merchantName}
-//                         className="cardImage"
-//                         onError={(e) => {
-//                             e.target.onerror = null; // prevent infinite loop
-//                             e.target.src = "order/empty_merchant.png";
-//                         }}
-//                     />
-//                     <div className="cardContent">
-//                         <div className="cardTitle">
-//                             <span>{merchant.merchantName}</span>
-//                             <span>{merchant.displayAddress || ""}</span>
-//                         </div>
-//                         <div className="cardRating">
-//                             Rating: {merchant.rating || "5.0"}
-//                         </div>
-//                     </div>
-
-//                 </div>
-//                 <div>
-//                   {Array.isArray(categories) && categories.map((item) => {
-//                     // Check the actual structure of your category data
-//                     const category = item.category || item;
-//                     return (
-//                         <div key={category.categoryId}>
-//                             <h2>{category.categoryName}</h2>
-//                         </div>
-//                     );
-//                 })}
-
-
-//                 </div>
-//             </main>
-//         </>
-//     );
-// });
-
-// ProductList.displayName = "ProductList";
-// export default ProductList;
-
-
-
-import React, { useEffect, useState } from "react";
-import { fetchMerchantData } from "../../services/Universal_Flow/merchantService";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import "../../styles/Universal_Flow/merchantStyles.css";
-import { fetchMerchantCategories, fetchProducts } from "../../services/Universal_Flow/universalService";
-import { IoIosArrowDropright, IoIosArrowDropdown } from "react-icons/io";
+import { fetchMerchantData } from "../../services/Universal_Flow/merchantService";
+import {
+  fetchMerchantCategories,
+  fetchProducts,
+  searchProducts,
+} from "../../services/Universal_Flow/universalService";
+
+import MerchantCard from "../Components/ProductLists/MerchantCard";
+import CategoryList from "../Components/ProductLists/CategoryList";
+import ProductCard from "../Components/ProductLists/ProductCard";
+import FloatingCart from "../Components/ProductLists/FloatingCart";
+import MerchantBanner from "../Components/ProductLists/MerchantBanner";
 
 const ProductList = () => {
-    const { state } = useLocation();
-    const merchantId = state?.merchantId;
-    const businessCategoryId = state?.businessCategoryId;
-    const [merchant, setMerchant] = useState({});
-    const [categories, setCategories] = useState([]);
-    const [products, setProductData] = useState([]);
-    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const { state } = useLocation();
+  const merchantId = state?.merchantId;
+  const businessCategoryId = state?.businessCategoryId;
 
+  const [merchant, setMerchant] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [cart, setCart] = useState({});
 
-    useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                // 1. Fetch merchant data
-                const merchantData = await fetchMerchantData(merchantId);
-                console.log("Merchant", merchantData);
-                setMerchant(merchantData);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const debounceTimeout = useRef(null);
+  const productRef = useRef(null);
 
-                // 2. Fetch merchant categories
-                const categoryData = await fetchMerchantCategories(merchantId, businessCategoryId, 1, 200);
-                console.log("Merchant Categories", categoryData);
-                // Make sure to set the correct part of the response
-                setCategories(categoryData?.data || categoryData || []);
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const merchantData = await fetchMerchantData(merchantId);
+        const categoryData = await fetchMerchantCategories(
+          merchantId,
+          businessCategoryId,
+          1,
+          200
+        );
+        const fetchedCategories = categoryData?.data || [];
+        const defaultCategoryId =
+          fetchedCategories[0]?.category?.categoryId ||
+          fetchedCategories[0]?.categoryId;
 
+        setMerchant(merchantData);
+        setCategories(fetchedCategories);
+        setSelectedCategoryId(defaultCategoryId);
 
-            } catch (error) {
-                console.error("Failed to load initial data:", error);
-            }
-        };
-        loadInitialData();
-    }, [merchantId, businessCategoryId]);
+        const productData = await fetchProducts(defaultCategoryId, 1, 200);
+        setProducts(productData?.data || []);
+      } catch (err) {
+        console.error("Load Error:", err);
+      }
+    };
 
-    const handleClick = async (categoryId) => {
-        setSelectedCategoryId(categoryId);
-        try {
-            const productData = await fetchProducts(categoryId, 1, 200);
-            setProductData(productData?.data || []);
+    loadInitialData();
+  }, [merchantId, businessCategoryId]);
 
-        } catch (error) {
-            console.log("Error in fetch Products", error);
-        }
+  const handleCategoryClick = async (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    const productData = await fetchProducts(categoryId, 1, 200);
+    setProducts(productData?.data || []);
+    setSearchText(""); // clear search on category change
+    setTimeout(() => productRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+  };
+  const handleSearch = useCallback(async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
     }
 
-    return (
-        <main className="flex flex-col">
-            Product List
-            <div className="card">
-                <img
-                    src={merchant.merchantImage || "order/empty_merchant.png"}
-                    alt={merchant.merchantName}
-                    className="cardImage"
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "order/empty_merchant.png";
-                    }}
-                />
-                <div className="cardContent">
-                    <div className="cardTitle">
-                        <span>{merchant.merchantName}</span>
-                        <span>{merchant.displayAddress || ""}</span>
-                    </div>
-                    <div className="cardRating">
-                        Rating: {merchant.rating || "5.0"}
-                    </div>
-                </div>
+    try {
+      const data = await searchProducts(merchantId, query);
+      setSearchResults(data || []);
+    } catch (err) {
+      console.error("Search failed:", err);
+      setSearchResults([]);
+    }
+  }, [merchantId]);
+
+  // 🚀 Single debounce effect in parent only
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchText);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchText, handleSearch]);
+
+  // 🎯 Proper rendering logic
+  const productListToRender = searchText.trim() ? searchResults : products;
+
+
+  console.log('Rendering:', productListToRender);
+
+
+  return (
+    <main className="flex flex-col md:px-18 px-6 py-5 gap-4 bg-white">
+      <MerchantCard
+        merchant={merchant}
+        businessCategoryId={businessCategoryId}
+        searchText={searchText}
+        setSearchText={setSearchText}
+      />
+
+      <MerchantBanner merchantId={merchantId} />
+
+      <div className="flex flex-col lg:flex-row gap-16">
+        <CategoryList
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onCategoryClick={handleCategoryClick}
+        />
+
+        <div ref={productRef} className="w-full lg:w-2/3 space-y-4">
+          {productListToRender.length > 0 ? (
+            productListToRender.map((product) => (
+              <ProductCard
+                key={product.productId}
+                product={product}
+                cart={cart}
+                setCart={setCart}
+              />
+            ))
+          ) : searchText.trim() ? ( // Only show "no results" for searches
+            <div className="text-gray-500 text-center text-lg py-10">
+              No products found for "{searchText}"
             </div>
-            <div className="flex flex-row">
-                <div className="p-[5rem]">
-                    {Array.isArray(categories) &&
-                        categories.map((item) => {
-                            const category = item.category || item;
-                            const isSelected = selectedCategoryId === category.categoryId;
+          ) : null}
+        </div>
+      </div>
 
-                            return (
-                                <div
-                                    key={category.categoryId}
-                                    className={`p-5 cursor-pointer transition-all shadow-sm flex flex-row justify-between items-center
-                                    ${isSelected ? "bg-green-500 rounded-lg text-white" : "bg-gray-200 text-black hover:bg-gray-400"}`}
-
-                                    onClick={() => handleClick(category.categoryId)}
-                                >
-                                    <h2>{category.categoryName}</h2>
-                                    {isSelected ? <IoIosArrowDropdown size={25} /> : <IoIosArrowDropright size={25} />}
-                                </div>
-                            );
-                        })}
-                </div>
-
-                <div className="p-[5rem] w-[100rem]">
-                    <div className="space-y-4"> {/* Adds vertical space between cards */}
-                        {Array.isArray(products) && products.map((item) => {
-                            const product = item.product || item;
-                            return (
-                                <div key={product.productId} className="bg-gray-100 rounded-2xl flex flex-row justify-start items-start">
-                                    <img src={product.productImageURL} className="h-60 h-50 object-cover" />
-                                    <h2 className="p-5 text-2xl">{product.productName}</h2>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    );
+      <FloatingCart merchantId={merchantId} />
+    </main>
+  );
 };
 
-ProductList.displayName = "ProductList";
 export default ProductList;
