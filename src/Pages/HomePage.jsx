@@ -37,7 +37,7 @@ const HomePage = () => {
   };
 
   return (
-    <main className="bg-gradient-to-b from-[#00CED1] via-white to-white min-h-screen p-12">
+    <main className="bg-gradient-to-b from-[#00CED1] via-white to-white min-h-screen md:p-12 p-4 w-100%">
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ const HomePage = () => {
         </AnimatePresence>
       </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <section className="grid justify-center grid-cols-1 md:grid-cols-3 mb-12">
         {[
           {
             title: "HOME DELIVERY",

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import "../../styles/Universal_Flow/universalStyles.css";
 import { fetchCategories } from "../../services/Universal_Flow/universalService";
 
-const Home_Delivery = React.memo = (() => {
+const Home_Delivery =() => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("authToken");
@@ -132,7 +132,7 @@ const Home_Delivery = React.memo = (() => {
       </motion.div>
     </main>
   );
-});
+};
 
 Home_Delivery.displayName = "Home_Delivery";
 export default Home_Delivery;

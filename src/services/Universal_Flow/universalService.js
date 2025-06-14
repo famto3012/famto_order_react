@@ -1,5 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../BaseURL";
+import { useNavigate } from "react-router-dom";
 
 
 export const fetchCategories = async (token) => {
@@ -79,6 +80,12 @@ export const fetchVariants = async (productId) => {
 export const sendItemData = async (payload) => {
   const token = localStorage.getItem("authToken");
 
+  console.log('Token', token);
+
+  if (!token) {
+    throw new Error("User not authenticated");
+  }
+
   try {
     const response = await axios.post(
       `${BASE_URL}/customers/add-items`,
@@ -91,36 +98,49 @@ export const sendItemData = async (payload) => {
       }
     );
 
-    return response.data; // return response if needed
+    console.log('Status code',response.status);
+
+    if(response.status == 401) {
+         throw new Error("User not authenticated");
+    }
+    return response.data;
   } catch (error) {
     console.error("Error sending item data:", error);
-    throw error; // rethrow if you want to handle it outside
+    throw error;
   }
 };
-
-export const updateItemData = async (productId, newQuantity) => {
+export const updateItemData = async (productId, newQuantity, variantTypeId) => {
   const token = localStorage.getItem('authToken');
   try{
     const response = await axios.put(`${BASE_URL}/customers/update-cart`,{
       productId : productId,
-      quantity : newQuantity
+      quantity : newQuantity,
+      variantTypeId : variantTypeId
     },{
       withCredentials: true,
       headers : {
         Authorization : `Bearer ${token}`
       }
     });
+    console.log('Update Items',response.status);
     return response.data;
   } catch (error){
-    console.log(error);
+    console.log("error in update items",error);
   }
 }
 
 
 export const updateCartDetail = async(payload) => {
 const token = localStorage.getItem('authToken');
+console.log('Pay load',payload);
 try {
-  const response = await axios.post(`${BASE_URL}/customers/cart/add-details`,payload,{
+  const response = await axios.post(`${BASE_URL}/customers/cart/add-details`,{
+    businessCategoryId: payload.businessCategoryId,
+    instructionToMerchant : payload.merchantInstruction,
+    instructionToDeliveryAgent : payload.customerNote,
+    deliveryMode: payload.orderType,
+    deliveryAddressType : "home"
+  },{
     headers: {
       Authorization : `Bearer ${token}`
     },
