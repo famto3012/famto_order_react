@@ -5,7 +5,8 @@ import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import MapsHomeWorkOutlinedIcon from "@mui/icons-material/MapsHomeWorkOutlined";
 import { useEffect } from "react";
 import { fetchCustomerAddress } from "../../services/Pick_Drop/pickdropService";
-const AddressSelector = () => {
+
+const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  onPickupInstructionChange = () => {},onDeliveryInstructionChange = () => {}, }) => {
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDrop, setSelectedDrop] = useState(null);
   const [formVisible, setFormVisible] = useState(false);
@@ -24,7 +25,10 @@ const AddressSelector = () => {
     pickupInstructions: "",
     deliveryInstructions: "",
   });
-
+  const [instructionData, setInstructionData] = useState({
+    instructionInPickup: "",
+    instructionInDelivery: "",
+  });
   useEffect(() => {
     const loadAddresses = async () => {
       const token = localStorage.getItem("authToken");
@@ -38,7 +42,7 @@ const AddressSelector = () => {
               flat: res.homeAddress.flat,
               street: res.homeAddress.area,
               nearby: res.homeAddress.landmark,
-              addressType: "Home",
+              addressType: "home",
             }
           : null,
         Work: res.workAddress
@@ -48,7 +52,7 @@ const AddressSelector = () => {
               flat: res.workAddress.flat,
               street: res.workAddress.area,
               nearby: res.workAddress.landmark,
-              addressType: "Work",
+              addressType: "work",
             }
           : null,
         Others:
@@ -58,7 +62,7 @@ const AddressSelector = () => {
             flat: addr.flat,
             street: addr.area,
             nearby: addr.landmark,
-            addressType: "Others",
+            addressType: "other",
           })) || [],
       };
       setAddressList(formatted);
@@ -67,13 +71,43 @@ const AddressSelector = () => {
   }, []);
 
   const handleSelectPickup = (type) => {
-    setSelectedPickup(type === selectedPickup ? null : type);
-    if (selectedDrop === type) setSelectedDrop(null);
+    const address =
+      type === "home"
+        ? addressList.Home
+        : type === "work"
+        ? addressList.Work
+        : addressList.Others[0]; // you can allow choosing specific one if multiple
+
+    const isSelected = selectedPickup === type ? null : type;
+    setSelectedPickup(isSelected);
+    setSelectedDrop(isSelected === selectedDrop ? null : selectedDrop);
+    onPickupSelect?.(isSelected ? address : null);
   };
 
   const handleSelectDrop = (type) => {
-    if (type !== selectedPickup) {
-      setSelectedDrop(type === selectedDrop ? null : type);
+    if (type === selectedPickup) return;
+    const address =
+      type === "home"
+        ? addressList.Home
+        : type === "work"
+        ? addressList.Work
+        : addressList.Others[0];
+
+    const isSelected = selectedDrop === type ? null : type;
+    setSelectedDrop(isSelected);
+    onDropSelect?.(isSelected ? address : null);
+  };
+
+    const handleInstructionChange = (e) => {
+    const { name, value } = e.target;
+    setInstructionData({ ...instructionData, [name]: value });
+
+    // Notify parent about instructions
+    if (name === "instructionInPickup") {
+      onPickupInstructionChange(value);
+    }
+    if (name === "instructionInDelivery") {
+      onDeliveryInstructionChange(value);
     }
   };
   const handleInputChange = (e) => {
@@ -81,13 +115,13 @@ const AddressSelector = () => {
   };
   const handleSave = () => {
     setAddressList((prev) => {
-      if (formData.addressType === "Others") {
+      if (formData.addressType === "other") {
         return { ...prev, Others: [...prev.Others, formData] };
       } else {
         return { ...prev, [formData.addressType]: formData };
       }
     });
-
+    onPickupSelect?.(formData);
     setFormVisible(false);
     setSelectedPickup(formData.addressType);
     setFormData({
@@ -96,7 +130,7 @@ const AddressSelector = () => {
       flat: "",
       street: "",
       nearby: "",
-      addressType: "Home",
+      addressType: "home",
       pickupInstructions: "",
       deliveryInstructions: "",
     });
@@ -109,24 +143,36 @@ const AddressSelector = () => {
       formData.addressType
     );
   };
+  const handleNewPickAddress = (data) => {
+    setPickAndDropData({
+      ...pickAndDropData,
+      newPickupAddress: data,
+      pickUpAddressType: null,
+      pickUpAddressOtherAddressId: null,
+    });
+  };
 
+  const handleToggleNewPickAddress = () => {
+    setPickAndDropData({
+      ...pickAndDropData,
+      pickUpAddressType: null,
+      pickUpAddressOtherAddressId: null,
+    });
+    setPickAddressType(null);
+    setPickAddressId(null);
+    setClearSignal(true);
+  };
   return (
     <div className="max-w-6xl mx-auto mt-12 ">
       <p className="font-[600] mb-5 text-[24px] ">Pick Up</p>
       {/* Buttons Row */}
       <div className="flex items-center justify-between  ">
         {[
-          { type: "Home", icon: <HomeOutlinedIcon fontSize="large" /> },
-          { type: "Work", icon: <WorkOutlineOutlinedIcon fontSize="large" /> },
-          {
-            type: "Others",
-            icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
-          },
-          {
-            type: "Add",
-            icon: <AddLocationAltOutlinedIcon fontSize="large" />,
-          },
-        ].map(({ type, icon }) => (
+          {label: "HOME", type: "home", icon: <HomeOutlinedIcon fontSize="large" /> },
+          {label: "WORK",type: "work", icon: <WorkOutlineOutlinedIcon fontSize="large" /> },
+          {label: "OTHERS",type: "other",icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,},
+          {label: "ADD",type: "add", icon: <AddLocationAltOutlinedIcon fontSize="large" />},
+        ].map(({ type, icon,label }) => (
           <button
             key={type}
             type="button"
@@ -136,10 +182,10 @@ const AddressSelector = () => {
                 : "bg-gray-300 text-[20px]"
             }`}
             onClick={() =>
-              type === "Add" ? setFormVisible(true) : handleSelectPickup(type)
+              type === "add" ? setFormVisible(true) : handleSelectPickup(type)
             }
           >
-            {icon} {type}
+            {icon} {label}
           </button>
         ))}
       </div>
@@ -205,7 +251,7 @@ const AddressSelector = () => {
           <div className="flex items-center">
             <label className="w-1/3">Labelled as</label>
             <div className="mb-4 flex gap-4 ">
-              {["Home", "Work", "Others"].map((type) => (
+              {["home", "work", "other"].map((type) => (
                 <label key={type} className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -232,7 +278,7 @@ const AddressSelector = () => {
         </div>
       )}
 
-      {selectedPickup === "Home" && addressList.Home && (
+      {selectedPickup === "home" && addressList.Home && (
         <div className="mt-4 p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left">
           <p className="font-semibold">{addressList.Home.fullName}</p>
           <p className="text-gray-600">{addressList.Home.phone}</p>
@@ -243,7 +289,7 @@ const AddressSelector = () => {
         </div>
       )}
 
-      {selectedPickup === "Work" && addressList.Work && (
+      {selectedPickup === "work" && addressList.Work && (
         <div className="mt-4 p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left">
           <p className="font-semibold">{addressList.Work.fullName}</p>
           <p className="text-gray-600">{addressList.Work.phone}</p>
@@ -254,7 +300,7 @@ const AddressSelector = () => {
         </div>
       )}
 
-      {selectedPickup === "Others" && addressList.Others.length > 0 && (
+      {selectedPickup === "other" && addressList.Others.length > 0 && (
         <div className="mt-4 space-y-2">
           {addressList.Others.map((addr, index) => (
             <div
@@ -273,10 +319,10 @@ const AddressSelector = () => {
 
       <input
         type="text"
-        name="pickupInstructions"
+        name="instructionInPickup"
         placeholder="Instructions to Pick up"
-        value={formData.pickupInstructions}
-        onChange={handleInputChange}
+        value={instructionData.instructionInPickup}
+        onChange={handleInstructionChange}
         className="w-full p-4 border border-gray-300 rounded my-8"
       />
       {selectedPickup && (
@@ -284,20 +330,11 @@ const AddressSelector = () => {
           <p className="font-[600] mb-5 text-[24px]">Drop</p>
           <div className="flex items-center justify-between  ">
             {[
-              { type: "Home", icon: <HomeOutlinedIcon fontSize="large" /> },
-              {
-                type: "Work",
-                icon: <WorkOutlineOutlinedIcon fontSize="large" />,
-              },
-              {
-                type: "Others",
-                icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
-              },
-              {
-                type: "Add",
-                icon: <AddLocationAltOutlinedIcon fontSize="large" />,
-              },
-            ].map(({ type, icon }) => (
+              {label: "HOME", type: "home", icon: <HomeOutlinedIcon fontSize="large" /> },
+              {label: "WORK", type: "work", icon: <WorkOutlineOutlinedIcon fontSize="large" />,},
+              {label: "OTHERS",type: "other",icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,},
+              {label: "ADD",type: "add",icon: <AddLocationAltOutlinedIcon fontSize="large" />,},
+            ].map(({ type, icon,label }) => (
               <button
                 key={type}
                 type="button"
@@ -307,16 +344,16 @@ const AddressSelector = () => {
                     : "bg-gray-300 text-[20px]"
                 }`}
                 onClick={() =>
-                  type === "Add" ? setFormVisible(true) : handleSelectDrop(type)
+                  type === "add" ? setFormVisible(true) : handleSelectDrop(type)
                 }
               >
-                {icon} {type}
+                {icon} {label}
               </button>
             ))}
           </div>
         </div>
       )}
-      {selectedDrop === "Home" && addressList.Home && (
+      {selectedDrop === "home" && addressList.Home && (
         <div className="mt-4 p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left">
           <p className="font-semibold">{addressList.Home.fullName}</p>
           <p className="text-gray-600">{addressList.Home.phone}</p>
@@ -327,7 +364,7 @@ const AddressSelector = () => {
         </div>
       )}
 
-      {selectedDrop === "Work" && addressList.Work && (
+      {selectedDrop === "work" && addressList.Work && (
         <div className="mt-4 p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left">
           <p className="font-semibold">{addressList.Work.fullName}</p>
           <p className="text-gray-600">{addressList.Work.phone}</p>
@@ -338,7 +375,7 @@ const AddressSelector = () => {
         </div>
       )}
 
-      {selectedDrop === "Others" && addressList.Others.length > 0 && (
+      {selectedDrop === "other" && addressList.Others.length > 0 && (
         <div className="mt-4 space-y-2">
           {addressList.Others.map((addr, index) => (
             <div
@@ -358,10 +395,10 @@ const AddressSelector = () => {
       {selectedPickup && (
         <input
           type="text"
-          name="deliveryInstructions"
+          name="instructionInDelivery"
           placeholder="Instructions to Delivery"
-          value={formData.deliveryInstructions}
-          onChange={handleInputChange}
+          value={instructionData.instructionInDelivery}
+          onChange={handleInstructionChange}
           className="w-full p-4 border border-gray-300 rounded my-8"
         />
       )}
