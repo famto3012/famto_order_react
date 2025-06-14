@@ -1,0 +1,157 @@
+.custom-order-container {
+  display: flex;
+  padding: 4rem;
+  gap: 40px;
+  background: #f8f8f8;
+  min-height: 100vh;
+}
+
+.order-section {
+  flex: 1;
+  background: white;
+  padding: 30px;
+  padding: 3rem;
+  border-radius: 10px;
+}
+
+.primary-btn {
+  display: block;
+  width: 70%;
+  margin: 10px 0;
+  padding: 12px;
+  background: #00cfd0;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-group {
+  margin: 15px 0;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  background: #ddd;
+  border: none;
+  border-radius: 5px;
+}
+
+.quantity-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quantity-group .unit {
+  background: #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ccc;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.secondary-btn {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  background: #00ced1;
+  border: none;
+  border-radius: 3rem;
+  font-weight: bold;
+  color: #f0f0f0;
+  cursor: pointer;
+}
+
+.delivery-heading {
+  color: teal;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.address-options {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.address-options button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.instruction-box {
+  width: 100%;
+  padding: 10px;
+  background: #ddd;
+  border: none;
+margin-top: 20px;
+  border-radius: 5px;
+}
+
+.checkout-box {
+  width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.checkout-img {
+  width: 100%;
+  height: 5rem;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.checkout-item p {
+  text-align: center;
+  font-weight: bold;
+}
+
+.tag-options {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px 0;
+}
+
+.tag-options button {
+  background: #00cfd0;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.bill-summary {
+  margin-top: 15px;
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.bill-row.total {
+  margin-top: 10px;
+  font-weight: bold;
+}

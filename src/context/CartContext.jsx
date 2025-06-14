@@ -8,10 +8,10 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState({});
 
-  const increment = async (productId) => {
+  const increment = async (productId, variantTypeId) => {
     setCart((prev) => {
       const newQuantity = (prev[productId]?.quantity || 0) + 1;
-      updateItemData(productId, newQuantity); // fire API
+      updateItemData(productId, newQuantity, variantTypeId); // fire API
       return {
         ...prev,
         [productId]: {
@@ -22,17 +22,17 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const decrement = async (productId) => {
+  const decrement = async (productId, variantTypeId) => {
     setCart((prev) => {
       const updated = { ...prev };
       const newQuantity = (updated[productId]?.quantity || 1) - 1;
 
       if (newQuantity <= 0) {
         delete updated[productId];
-           updateItemData(productId, 0); // fire API
+           updateItemData(productId, 0, variantTypeId); // fire API
       } else {
         updated[productId].quantity = newQuantity;
-          updateItemData(productId, newQuantity); // fire API
+          updateItemData(productId, newQuantity, variantTypeId); // fire API
       }
 
       return updated;

@@ -8,6 +8,7 @@ import MerchantLists from "./Pages/Universal_Flow/MerchantLists";
 import LoginPage from "./Pages/Components/LoginPage";
 import ProductList from "./Pages/Universal_Flow/ProductList";
 import CheckoutPage from "./Pages/Universal_Flow/CheckoutPage";
+import Custom_Order from "./Pages/CustomOrder/Custom_Order";
 
 function App() {
   return(
@@ -20,6 +21,7 @@ function App() {
       <Route path="/merchants" element={<MerchantLists />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/products" element={<ProductList />} />
+      <Route path="/custom-order" element={<Custom_Order />} />
       <Route path="/checkout-page" element={<CheckoutPage />} />
     </Routes>
     </BrowserRouter>

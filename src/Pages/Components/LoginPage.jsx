@@ -3,7 +3,7 @@ import axios from "axios";
 import BASE_URL from "../../BaseURL";
 import { useNavigate } from "react-router-dom";
 
-const LoginPage = React.memo = (() => {
+const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -87,7 +87,7 @@ const LoginPage = React.memo = (() => {
       </div>
     </div>
   );
-});
+};
 
 LoginPage.displayName = "LoginPage";
 export default LoginPage;

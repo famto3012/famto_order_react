@@ -170,9 +170,9 @@ const ProductCard = ({ product }) => {
           {product.inventory ? (
             quantity > 0 ? (
               <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 flex items-center gap-5 bg-white px-6 py-1 rounded-full shadow">
-                <button className="text-red-600 text-xl font-bold" onClick={() => decrement(product.productId)}>−</button>
+                <button className="text-red-600 text-xl font-bold" onClick={() => decrement(product.productId, item?.variantTypeId)}>−</button>
                 <span className="font-semibold">{quantity}</span>
-                <button className="text-green-600 text-xl font-bold" onClick={() => increment(product.productId)}>＋</button>
+                <button className="text-green-600 text-xl font-bold" onClick={() => increment(product.productId, item?.variantTypeId)}>＋</button>
               </div>
             ) : (
               <button
@@ -226,7 +226,7 @@ const ProductCard = ({ product }) => {
                     className="border p-3 rounded-md flex justify-between items-center hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       addToCart({
-                        productId: variant._id,
+                        productId: product.productId,
                         productName: variant.typeName,
                         price: variant.price,
                         variantTypeId: variant._id,
