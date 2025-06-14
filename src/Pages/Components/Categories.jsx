@@ -1,6 +1,19 @@
-import { useState } from "react";
-import { Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { useEffect, useImperativeHandle, useState } from "react";
+import {
+  Card,
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  fetchVehicleCharges,
+  submitPickDropRequest,
+  submitUpdateItemRequest,
+} from "../../services/Pick_Drop/pickdropService";
 
 const categories = [
   { name: "Documents & Parcels", image: "/order/documents_parcels.jpg" },
@@ -10,7 +23,6 @@ const categories = [
   { name: "Personal Items", image: "/order/personal_items.png" },
   { name: "Gifts & Flowers", image: "/order/gift_flowers.jpeg" },
   { name: "Electronics", image: "/order/electronics.jpg" },
-  // { name: "Household items", image: "/order/household.jpg" },
   { name: "Books & Stationary", image: "/order/books_stationery.jpg" },
   { name: "Online Orders", image: "/order/online_orders.jpg" },
   { name: "Pet Supplies", image: "/order/pet_supplies.jpg" },
@@ -18,17 +30,69 @@ const categories = [
   { name: "Others", image: "/order/household.jpg" },
 ];
 
-export default function CategoryGrid({ onSavePackage }) { 
+export default function CategoryGrid({
+  onSavePackage,
+  pickupAddress,
+  dropAddress,
+  pickupInstructions,
+  deliveryInstructions,
+  onCartIdReceived,
+  savedPackages,
+  onEditCategoryIdClear,
+  editCategoryId,
+  onDeleteCategoryIdClear,
+  deletedCategoryId,
+  vehicleChargesCallback,
+}) {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [formData, setFormData] = useState({ length: "", width: "", height: "", weight: "" });
+  const [formData, setFormData] = useState({
+    length: "",
+    width: "",
+    height: "",
+    weight: "",
+  });
   const [savedData, setSavedData] = useState({});
+  const [hasSubmittedOnce, setHasSubmittedOnce] = useState(false);
   const [modalImage, setModalImage] = useState("");
+
+useEffect(() => {
+  if (editCategoryId !== null) {
+    setSelectedItem(editCategoryId);
+    setFormData(
+      savedPackages[editCategoryId] || {
+        length: "",
+        width: "",
+        height: "",
+        weight: "",
+      }
+    );
+    setModalImage(categories[editCategoryId].image);
+    setOpen(true);
+    onEditCategoryIdClear(); 
+  }
+}, [editCategoryId]);
+
+useEffect(() => {
+  if (deletedCategoryId !== null) {
+    const updatedData = { ...savedData }; 
+    delete updatedData[deletedCategoryId];
+    setSavedData(updatedData); 
+    if (onSavePackage) {
+      onSavePackage(updatedData);
+    }
+    onDeleteCategoryIdClear();
+  }
+}, [deletedCategoryId]);
+
+
 
   const handleOpen = (index) => {
     setSelectedItem(index);
     setModalImage(categories[index].image);
-    setFormData(savedData[index] || { length: "", width: "", height: "", weight: "" });
+    setFormData(
+      savedData[index] || { length: "", width: "", height: "", weight: "" }
+    );
     setOpen(true);
   };
 
@@ -40,24 +104,197 @@ export default function CategoryGrid({ onSavePackage }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    const updatedData = { 
-        ...savedData, 
-        [selectedItem]: { 
-            ...formData, 
-            image: categories[selectedItem].image, 
-            name: categories[selectedItem].name 
-        } 
-    };
-    setSavedData(updatedData);
+  // const handleSave = async () => {
 
-    if (onSavePackage) {  // Ensure function is provided before calling
-        onSavePackage(updatedData);
+  //   const token = localStorage.getItem("authToken");
+  //   if (!token) return;
+  //   const updatedData = {
+  //     ...savedData,
+  //     [selectedItem]: {
+  //       ...formData,
+  //       image: categories[selectedItem].image,
+  //       name: categories[selectedItem].name,
+  //     },
+  //   };
+  //   setSavedData(updatedData);
+
+  //   const selectedPackage = updatedData[selectedItem];
+
+  //   const formDataToSend = new FormData();
+
+  //   // Pickup address
+  //   formDataToSend.append("pickUpAddressType", pickupAddress.addressType);
+  //   formDataToSend.append("pickUpAddressOtherAddressId","");
+  //   formDataToSend.append("newPickupAddress[fullName]", "");
+  //   formDataToSend.append("newPickupAddress[phoneNumber]", "");
+  //   formDataToSend.append("newPickupAddress[flat]", "");
+  //   formDataToSend.append("newPickupAddress[area]", "");
+  //   formDataToSend.append("newPickupAddress[landmark]", "");
+  //   formDataToSend.append("newPickupAddress[coordinates][0]", "");
+  //   formDataToSend.append("newPickupAddress[coordinates][1]", "");
+  //   formDataToSend.append("addNewPickupToAddressBook", "");
+  //   formDataToSend.append("instructionInPickup",pickupInstructions);
+  //   formDataToSend.append("voiceInstructionInPickup", "");
+
+  //   // Delivery address
+  //   formDataToSend.append("deliveryAddressType",dropAddress.addressType);
+  //   formDataToSend.append("deliveryAddressOtherAddressId", "");
+  //   formDataToSend.append("newDeliveryAddress[fullName]", "");
+  //   formDataToSend.append("newDeliveryAddress[phoneNumber]", "");
+  //   formDataToSend.append("newDeliveryAddress[flat]", "");
+  //   formDataToSend.append("newDeliveryAddress[area]", "");
+  //   formDataToSend.append("newDeliveryAddress[landmark]", "");
+  //   formDataToSend.append("newDeliveryAddress[coordinates][0]", "");
+  //   formDataToSend.append("newDeliveryAddress[coordinates][1]", "");
+  //   formDataToSend.append("addNewDeliveryToAddressBook", "");
+  //   formDataToSend.append("instructionInDelivery", deliveryInstructions);
+  //   formDataToSend.append("voiceInstructionInDelivery", "");
+
+  //   // Schedule
+  //   formDataToSend.append("startDate", "");
+  //   formDataToSend.append("endDate", "");
+  //   formDataToSend.append("time", "");
+
+  //   // Package item
+  //   const item = {
+  //     itemName: selectedPackage.name,
+  //     length: selectedPackage.length,
+  //     width: selectedPackage.width,
+  //     height: selectedPackage.height,
+  //     weight: selectedPackage.weight,
+  //   };
+
+  //   formDataToSend.append("item", JSON.stringify(item));
+
+  //   // 🔗 Make API call
+  //   try {
+  //     const response = await submitPickDropRequest(formDataToSend, token);
+  //     console.log("Pick & Drop Submitted:", response);
+  //       // 👈 adjust this based on actual API response shape
+  //  if (response?.cartId) {
+  //   onCartIdReceived(response.cartId);
+  //   console.log(response.cartId);
+  //   // make sure you passed this as a prop
+  // }
+  //     console.log("🟡 Submitting the following FormData:");
+  //    for (let [key, value] of formDataToSend.entries()) {
+  //   console.log(`${key}:`, value);
+  // }
+
+  //     alert("Pick & Drop Request Submitted Successfully");
+  //   } catch (error) {
+  //     console.error("Error submitting:", error);
+  //         console.log("🟡 Submitting the following FormData:");
+  // for (let [key, value] of formDataToSend.entries()) {
+  //   console.log(`${key}:`, value);
+  //   console.log(pickupAddress);
+  //   console.log(dropAddress);
+
+  // }
+  //     alert("Submission Failed");
+  //   }
+  //    if (onSavePackage) {
+  //         onSavePackage(updatedData);
+  //     }
+  //   setOpen(false);
+  // };
+  const handleSave = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("You're not logged in.");
+      return;
     }
 
-    setOpen(false);
-};
+    const updatedData = {
+      ...savedData,
+      [selectedItem]: {
+        ...formData,
+        image: categories[selectedItem].image,
+        name: categories[selectedItem].name,
+      },
+    };
 
+    const selectedPackage = updatedData[selectedItem];
+
+    try {
+      if (!hasSubmittedOnce) {
+        // 🟢 First item being saved: use pick & drop request
+        const formDataToSend = new FormData();
+        formDataToSend.append(
+          "pickUpAddressType",
+          pickupAddress.addressType || ""
+        );
+        formDataToSend.append("instructionInPickup", pickupInstructions || "");
+        formDataToSend.append(
+          "deliveryAddressType",
+          dropAddress.addressType || ""
+        );
+        formDataToSend.append(
+          "instructionInDelivery",
+          deliveryInstructions || ""
+        );
+
+        const item = {
+          itemName: selectedPackage.name,
+          length: selectedPackage.length,
+          width: selectedPackage.width,
+          height: selectedPackage.height,
+          weight: selectedPackage.weight,
+        };
+        formDataToSend.append("item", JSON.stringify(item));
+
+        const response = await submitPickDropRequest(formDataToSend, token);
+        if (response?.cartId) {
+          onCartIdReceived && onCartIdReceived(response.cartId);
+
+          const charges = await fetchVehicleCharges(token, response.cartId);
+          if (vehicleChargesCallback) {
+            vehicleChargesCallback(charges); // Send to parent
+          }
+        }
+
+        setHasSubmittedOnce(true);
+        console.log("pickdrop", response.cartId);
+        alert("Pick & Drop Request Submitted");
+      } else {
+        // 🟡 Subsequent save/edit
+        const itemsArray = Object.values(updatedData).map((item) => ({
+          itemName: item.name,
+          length: item.length,
+          width: item.width,
+          height: item.height || "",
+          unit: "cm",
+          weight: item.weight,
+        }));
+
+        const response = await submitUpdateItemRequest(itemsArray, token);
+        if (response?.updatedCart?._id) {
+          onCartIdReceived && onCartIdReceived(response.updatedCart._id);
+
+          const charges = await fetchVehicleCharges(
+            token,
+            response.updatedCart._id
+          );
+          if (vehicleChargesCallback) {
+            vehicleChargesCallback(charges); // Send to parent
+          }
+        }
+        console.log("update", response.updatedCart._id);
+
+        alert("Item updated successfully");
+      }
+
+      setSavedData(updatedData); // Save changes002.
+
+      if (onSavePackage) {
+        onSavePackage(updatedData);
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error("Submit failed:", error);
+      alert("Failed to save item.");
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto md:grid grid-cols-4 gap-6">
@@ -69,7 +306,11 @@ export default function CategoryGrid({ onSavePackage }) {
           transition={{ duration: 0.3 }}
         >
           <Card
-            sx={{ width: "250px",borderRadius: "30px", boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)" }}
+            sx={{
+              width: "250px",
+              borderRadius: "30px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+            }}
             className="text-center shadow-2xl cursor-pointer"
             onClick={() => handleOpen(index)}
           >
@@ -89,7 +330,11 @@ export default function CategoryGrid({ onSavePackage }) {
 
       <AnimatePresence>
         {open && (
-          <Dialog open={open} onClose={handleClose} className="backdrop-blur-lg">
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            className="backdrop-blur-lg"
+          >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -103,7 +348,9 @@ export default function CategoryGrid({ onSavePackage }) {
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="bg-white rounded-lg p-6 shadow-2xl"
               >
-                <DialogTitle className="text-center">Enter Package Details</DialogTitle>
+                <DialogTitle className="text-center">
+                  Enter Package Details
+                </DialogTitle>
                 <DialogContent className="flex flex-row gap-5">
                   <motion.img
                     src={modalImage}
@@ -149,8 +396,20 @@ export default function CategoryGrid({ onSavePackage }) {
                   </div>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={handleClose} sx={{ color: "black" }}>Cancel</Button>
-                  <Button onClick={handleSave} variant="contained" sx={{ backgroundColor: "#00ced1", color: "white", "&:hover": { backgroundColor: "#009ea0" } }}>Save</Button>
+                  <Button onClick={handleClose} sx={{ color: "black" }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#00ced1",
+                      color: "white",
+                      "&:hover": { backgroundColor: "#009ea0" },
+                    }}
+                  >
+                    Save
+                  </Button>
                 </DialogActions>
               </motion.div>
             </motion.div>
