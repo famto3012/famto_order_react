@@ -4,11 +4,12 @@ import "../../styles/Universal_Flow/CustomOrderStyles.css";
 import Address from "../Components/Address";
 import { useNavigate } from "react-router-dom";
 import MapModal from "../Mappls/MapModal";
+import { addItem, addShop, updateItem } from "../../services/Custom_Order/customOrderService";
 
 const CustomOrder = () => {
     const [itemName, setItemName] = useState("");
-    const [quantityCount, setQuantityCount] = useState(1);
-    const [quantityValue, setQuantityValue] = useState("");
+    const [quantity, setQuantityCount] = useState(1);
+    const [numOfUnits, setQuantityValue] = useState("");
     const [unit, setUnit] = useState("gm");
     const [instructions, setInstructions] = useState("");
     const [imageFile, setImageFile] = useState(null);
@@ -18,61 +19,130 @@ const CustomOrder = () => {
     const [place, setPlace] = useState("");
     const [showMapModal, setShowMapModal] = useState(false); // for modal
     const navigate = useNavigate();
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [isShopSaved, setIsShopSaved] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editItemData, setEditItemData] = useState(null);
 
-    const handleAddToCart = () => {
+
+    const handleAddToCart = async () => {
         if (!itemName) return alert("Please enter item name");
 
-        const newItem = {
+        const itemPayload = {
             itemName,
-            quantityCount,
-            quantityValue,
+            quantity,
+            numOfUnits,
             unit,
             instructions,
-            imageUrl: imageFile ? URL.createObjectURL(imageFile) : null,
+            itemImageURL: imageFile ? URL.createObjectURL(imageFile) : null,
             source: selectedSource,
             store: selectedSource === "map" ? store : null,
             place: selectedSource === "map" ? place : null,
         };
 
-        setCartItems([...cartItems, newItem]);
+        const result = await addItem(itemPayload);
 
-        // Clear fields
-        setItemName("");
-        setQuantityCount(1);
-        setQuantityValue("");
-        setUnit("gm");
-        setInstructions("");
-        setImageFile(null);
-        setStore("");
-        setPlace("");
+        if (result) {
+            console.log("Item response",result);
+            const newItem = {
+                ...itemPayload,
+                itemId: result.itemId,
+            };
 
-        document.getElementById("imageUpload").value = "";
+            setCartItems([...cartItems, newItem]);
+
+            // Clear fields
+            setItemName("");
+            setQuantityCount(1);
+            setQuantityValue("");
+            setUnit("gm");
+            setInstructions("");
+            setImageFile(null);
+            setStore("");
+            setPlace("");
+            document.getElementById("imageUpload").value = "";
+        } else {
+            alert("Failed to add item");
+        }
     };
+
 
     const handleLocationSelect = ({ lat, lng }) => {
-        setStore(`Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`);
-        setPlace("Custom selected location");
+        // setStore(`Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`);
+        // setPlace("Custom selected location");
+        setLatitude(lat);
+        setLongitude(lng);
         setShowMapModal(false);
+        console.log("Cordiantes in Custom order", lat, lng);
     };
 
+    const handleSaveShop = async () => {
+        if (!store || !place || latitude === null || longitude === null) {
+            alert("Please select a location on map and fill in store and place.");
+            return;
+        }
+
+        const payload = {
+            latitude,
+            longitude,
+            shopName: store,
+            place,
+            buyFromAnyWhere: false,
+        };
+
+        const result = await addShop(payload);
+        if (result === 200) {
+            setIsShopSaved(true);
+        }
+        console.log("Shop save result:", result);
+    };
+
+    const handleDeleteItem = (itemId) => {
+        console.log(itemId);
+        const updatedItems = cartItems.filter((item) => item.itemId !== itemId);
+        setCartItems(updatedItems);
+    };
+
+    const handleEditItem = (item) => {
+        setEditItemData(item);
+        setEditModalVisible(true);
+    };
+
+
+
+    const handleAnywhereShopSave = async () => {
+        const payload = {
+            buyFromAnyWhere: true,
+        };
+
+        const result = await addShop(payload);
+        console.log("Anywhere shop save result:", result);
+    };
+
+
     return (
-        <div className="custom-order-container">
+        <div className="custom-order-container flex flex-col md:flex-row">
             <div className="order-section">
                 {selectedSource === null && (
                     <div className="flex flex-col justify-center items-center mb-4">
                         <button
                             className="primary-btn"
                             onClick={() => {
+                                 handleAnywhereShopSave();
                                 setSelectedSource("anywhere");
-                                setStore("");
-                                setPlace("");
-                            }}
+                               
+                            }
+                            }
                         >
                             Buy From Anywhere
                         </button>
                         <button
                             className="primary-btn mt-2"
-                            onClick={() => setSelectedSource("map")}
+                            onClick={() => {
+                                setSelectedSource("map");
+                                setShowMapModal(true);
+                            }}
                         >
                             Buy From Map
                         </button>
@@ -88,9 +158,11 @@ const CustomOrder = () => {
                 {selectedSource === "map" && (
                     <div className="bg-gray-200 p-4 my-2 rounded-md text-white">
                         <div className="text-black text-lg font-semibold mb-2">Buy From Map</div>
-                        <button onClick={() => setShowMapModal(true)}>
+                        {/* <div className="flex justify-center">
+                        <button onClick={() => setShowMapModal(true)} className="bg-[#00ced1] p-3 rounded-full flex items-center justify-center">
                             Select Location on Map
                         </button>
+                        </div> */}
                         <div className="form-group mt-2">
                             <label className="text-black block mb-1">Store Name</label>
                             <input
@@ -113,11 +185,17 @@ const CustomOrder = () => {
                             />
                         </div>
 
-                        <div className="flex justify-center mt-4">
-                            <button className="bg-teal-600 text-white px-4 py-2 rounded-xl w-1/2">
-                                Save
-                            </button>
-                        </div>
+                        {!isShopSaved && (
+                            <div className="flex justify-center mt-4">
+                                <button
+                                    className="bg-teal-600 text-white px-4 py-2 rounded-xl w-1/2"
+                                    onClick={handleSaveShop}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        )}
+
                     </div>
                 )}
 
@@ -136,7 +214,7 @@ const CustomOrder = () => {
                     <input
                         type="number"
                         min="1"
-                        value={quantityCount}
+                        value={quantity}
                         onChange={(e) => setQuantityCount(e.target.value)}
                     />
                 </div>
@@ -145,7 +223,7 @@ const CustomOrder = () => {
                     <label>Quantity</label>
                     <input
                         type="text"
-                        value={quantityValue}
+                        value={numOfUnits}
                         onChange={(e) => setQuantityValue(e.target.value)}
                         placeholder="Enter Quantity"
                     />
@@ -179,13 +257,101 @@ const CustomOrder = () => {
                 />
             </div>
 
-            <CustomCheckout cartItems={cartItems} />
+            <CustomCheckout
+                cartItems={cartItems}
+                onEdit={handleEditItem}
+                onDelete={handleDeleteItem}
+            />
+
 
             <MapModal
                 isOpen={showMapModal}
                 onClose={() => setShowMapModal(false)}
                 onLocationSelect={handleLocationSelect}
             />
+
+            {editModalVisible && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-md w-full max-w-md">
+                        <h3 className="text-xl font-semibold mb-4">Edit Item</h3>
+                        <div className="space-y-3">
+                            <input
+                                type="text"
+                                value={editItemData.itemName}
+                                onChange={(e) =>
+                                    setEditItemData({ ...editItemData, itemName: e.target.value })
+                                }
+                                placeholder="Item Name"
+                                className="w-full border p-2"
+                            />
+                            <input
+                                type="number"
+                                value={editItemData.quantity}
+                                onChange={(e) =>
+                                    setEditItemData({ ...editItemData, quantity: e.target.value })
+                                }
+                                placeholder="Quantity"
+                                className="w-full border p-2"
+                            />
+                            <input
+                                type="text"
+                                value={editItemData.numOfUnits}
+                                onChange={(e) =>
+                                    setEditItemData({ ...editItemData, numOfUnits: e.target.value })
+                                }
+                                placeholder="No of Units"
+                                className="w-full border p-2"
+                            />
+                            <input
+                                type="text"
+                                value={editItemData.unit}
+                                onChange={(e) =>
+                                    setEditItemData({ ...editItemData, unit: e.target.value })
+                                }
+                                placeholder="Unit (e.g. gm, pcs)"
+                                className="w-full border p-2"
+                            />
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button
+                                className="bg-gray-300 px-4 py-2 rounded"
+                                onClick={() => setEditModalVisible(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-blue-600 text-white px-4 py-2 rounded"
+                                onClick={async () => {
+                                    const payload = {
+                                        itemName: editItemData.itemName,
+                                        quantity: editItemData.quantity,
+                                        numOfUnits: editItemData.numOfUnits,
+                                        unit: editItemData.unit,
+                                        instructions: editItemData.instructions || "",
+                                    };
+
+                                    const success = await updateItem(editItemData.itemId, payload);
+                                    if (success) {
+                                        setCartItems((prev) =>
+                                            prev.map((item) =>
+                                                item.itemId === editItemData.itemId ? { ...item, ...payload } : item
+                                            )
+                                        );
+                                        setEditModalVisible(false);
+                                    } else {
+                                        alert("Failed to update item.");
+                                    }
+                                }}
+                            >
+                                Save
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
