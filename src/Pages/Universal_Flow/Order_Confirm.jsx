@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Lottie from "lottie-react";
 import popper from "../../assets/popper.json";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation, useNavigate } from "react-router-dom";
+import { data, useLocation, useNavigate } from "react-router-dom";
 import {
   applyPromocode,
   applyTip,
@@ -18,7 +18,12 @@ import { LuSquareChevronDown } from "react-icons/lu";
 import { Card, CardContent } from "@mui/material";
 import { GrDownload } from "react-icons/gr";
 import { FiShoppingBag } from "react-icons/fi";
-const Checkout = () => {
+import {
+  confirmOrder,
+  fetchBill,
+  verifyPayment,
+} from "../../services/Universal_Flow/universalService";
+const Order_Confirm = () => {
   const [paymentMode, setPaymentMode] = useState("");
   const [showPopper, setShowPopper] = useState(false);
   const subtotal = 95.0;
@@ -26,6 +31,7 @@ const Checkout = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const confirmationData = state?.confirmationData;
+  const orderType = state?.orderType;
   const [selectedTip, setSelectedTip] = useState(null);
   const [billDetails, setBillDetails] = useState(null);
   const [isOther, setIsOther] = useState(false);
@@ -42,12 +48,12 @@ const Checkout = () => {
   const fetchCharges = async () => {
     const token = localStorage.getItem("authToken");
     if (!token || !confirmationData?.cartId) return;
-    const data = await fetchBillCharges(confirmationData.cartId, token);
-    setBillDetails(data);
+    const data = await fetchBill(confirmationData.cartId, token);
+    setBillDetails(data?.billDetail || {});
   };
 
   useEffect(() => {
-    console.log("Cart ID:", state?.cartId);
+    console.log("Cart ID:", confirmationData?.cartId);
     console.log("useEffect running for fetchBillCharges...");
     fetchCharges();
   }, [confirmationData?.cartId]);
@@ -72,7 +78,7 @@ const Checkout = () => {
     try {
       const res = await applyPromocode(
         confirmationData.cartId,
-        "Pick and Drop",
+        orderType,
         promoCode,
         token
       );
@@ -92,7 +98,9 @@ const Checkout = () => {
   const fetchPromos = async () => {
     setLoadingPromos(true);
     const token = localStorage.getItem("authToken"); // Or from context/auth state
-    const data = await fetchAvailablePromocode("Pick and Drop", token);
+    const data = await fetchAvailablePromocode(orderType, token);
+    console.log("hai merchant", orderType);
+
     setPromoCodes(data);
     setLoadingPromos(false);
   };
@@ -110,7 +118,7 @@ const Checkout = () => {
 
       const res = await applyTip(
         confirmationData.cartId,
-        "Pick and Drop",
+        orderType,
         tip,
         token
       );
@@ -140,7 +148,7 @@ const Checkout = () => {
         console.log("Tip selected:", customValue);
         const res = await applyTip(
           confirmationData.cartId,
-          "Pick and Drop",
+          orderType,
           customValue,
           token
         );
@@ -165,7 +173,7 @@ const Checkout = () => {
     }
 
     try {
-      await removePromocode(confirmationData.cartId, "Pick and Drop", token);
+      await removePromocode(confirmationData.cartId, orderType, token);
       console.log("✅ Promocode removed from backend");
       setSelectedPromoCode("");
       await fetchCharges();
@@ -176,23 +184,24 @@ const Checkout = () => {
   const token = localStorage.getItem("authToken");
 
   const confirmOrderMutation = useMutation({
-    mutationFn: () => confirmPickAndDropOrder(paymentMode, token),
+    mutationFn: () => confirmOrder(paymentMode, token),
     onSuccess: async (data) => {
       const { orderId, amount, success } = data;
 
       if (!success) return alert("❌ Order creation failed");
 
-      if (paymentMode === "cash") {
+      if (paymentMode === "Cash-on-delivery") {
         alert("✅ Order placed. Pay on delivery.");
-        navigate("/pick-drop");
+        navigate("/home-delivery");
       } else {
         if (!orderId || !amount) return alert("⚠️ Missing payment data.");
 
         try {
-          const result = await verifyPickAndDropPayment(orderId, amount, token);
+          const result = await verifyPayment(orderId, amount, token);
           if (result.success) {
             alert("✅ Payment successful!");
-            navigate(`/pick-drop/?orderId=${result.orderId}`); // ✅ Navigate from component
+            console.log("Take Away");
+            // navigate(`/home-delivery/?orderId=${result.orderId}`); // ✅ Navigate from component
           } else {
             alert("❌ Payment failed");
           }
@@ -326,11 +335,11 @@ const Checkout = () => {
             <div className="bg-white  border-gray-200 border-2 rounded-lg p-4 space-y-3 text-gray-700 shadow-sm">
               <div className="flex justify-between">
                 <span className="font-medium">Delivery Charges</span>
-                <span>₹{billDetails.deliveryCharge}</span>
+                <span>₹{billDetails.deliveryChargePerDay}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Surge charges</span>
-                <span>₹{billDetails.surgePrice ?? 0}</span>
+                <span>₹{billDetails.originalDeliveryCharge ?? 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Added Tip</span>
@@ -347,7 +356,7 @@ const Checkout = () => {
               <hr className="border-gray-400" />
               <div className="flex justify-between font-semibold">
                 <span className="font-medium">Grand Total</span>
-                <span>₹{billDetails.grandTotal}</span>
+                <span>₹{billDetails.discountedGrandTotal}</span>
               </div>
             </div>
           )}
@@ -464,16 +473,29 @@ const Checkout = () => {
         </div>
 
         {/* Payment Option */}
+
         <div className="mt-4">
           <h3 className="text-gray-700 font-medium">Pay</h3>
           <button
-            className={`px-4 py-2 rounded-lg border ${
+            className={`px-4 py-2 mt-4 rounded-lg border ${
               paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
             }`}
             onClick={() => setPaymentMode("Online-payment")}
           >
             Online Payment
           </button>
+          {orderType === "home-delivery" && (
+            <button
+              className={`px-4 py-2 rounded-lg border ${
+                paymentMode === "Cash-on-delivery"
+                  ? "bg-[#00CED1] text-white"
+                  : ""
+              }`}
+              onClick={() => setPaymentMode("Cash-on-delivery")}
+            >
+              Pay On Delivery
+            </button>
+          )}
         </div>
 
         {/* Confirm Order */}
@@ -505,5 +527,5 @@ const Checkout = () => {
   );
 };
 
-Checkout.displayName = "Checkout";
-export default Checkout;
+Order_Confirm.displayName = "Order_Confirm";
+export default Order_Confirm;
