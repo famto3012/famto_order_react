@@ -2,19 +2,20 @@ import React, { useState } from "react";
 import PersonPinCircleOutlinedIcon from "@mui/icons-material/PersonPinCircleOutlined";
 import AddressSelector from "../Components/AddressSelector";
 import CategoryGrid from "../Components/Categories";
-import {
-  Card,
-  CardContent,
-} from "@mui/material";
+import { Card, CardContent } from "@mui/material";
 import { FiEdit } from "react-icons/fi";
 import { FiTrash } from "react-icons/fi";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { FaArrowRight } from "react-icons/fa";
 import { confirmVehicleTypeandCharge } from "../../services/Pick_Drop/pickdropService";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import Cancel_Cart from "./Components/Cancel_Cart";
 
 const Pick_Drop = () => {
-  const navigate =useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const orderId = queryParams.get("orderId");
   const [editCategoryId, setEditCategoryId] = useState(null);
   const [deletedCategoryId, setDeletedCategoryId] = useState(null);
   const [savedPackages, setSavedPackages] = useState({});
@@ -58,16 +59,16 @@ const Pick_Drop = () => {
       const response = await confirmVehicleTypeandCharge(
         selectedVehicle.vehicleType,
         selectedVehicle.deliveryCharges,
-        selectedVehicle.surgeCharges, 
-        token 
+        selectedVehicle.surgeCharges,
+        token
       );
-      navigate("/checkout",{state:{confirmationData:response}});
+      navigate("/checkout", { state: { confirmationData: response } });
       console.log("API success:", response);
-      console.log( 
+      console.log(
         selectedVehicle.vehicleType,
         selectedVehicle.deliveryCharges,
-        selectedVehicle.surgeCharges,);
-      
+        selectedVehicle.surgeCharges
+      );
     } catch (err) {
       console.error("API call failed", err);
     }
@@ -313,7 +314,9 @@ const Pick_Drop = () => {
             </p>
             <FaArrowRight className="transform transition-transform duration-300 group-hover:translate-x-2" />
           </button>
+        
         </div>
+          {orderId && <Cancel_Cart orderId={orderId} />}
       </main>
     </>
   );
