@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../styles/Universal_Flow/CustomOrderStyles.css";
 
-const CustomCheckout = ({ cartItems = [] }) => {
+const CustomCheckout = ({ cartItems = [], onEdit, onDelete }) => {
     const [selectedTip, setSelectedTip] = useState(20);
     const [customTip, setCustomTip] = useState("");
     const [isOtherSelected, setIsOtherSelected] = useState(false);
@@ -13,11 +13,9 @@ const CustomCheckout = ({ cartItems = [] }) => {
     const discount = 10;
     const tax = 20;
 
-    // Calculate item total (just showing number of items × 100 for demo)
-    const itemsTotal = cartItems.length * 100;
+    
 
     const total =
-        itemsTotal +
         deliveryCharge +
         surgeCharge +
         waitingCharge +
@@ -35,30 +33,33 @@ const CustomCheckout = ({ cartItems = [] }) => {
         <div className="checkout-box">
             <h4>Checkout</h4>
 
-            {/* Item List */}
-            {cartItems.length > 0 ? (
-                cartItems.map((item, idx) => (
-                    <div className="checkout-item" key={idx}>
-                        <img
-                            src={item.imageUrl || "https://via.placeholder.com/100"}
-                            alt={item.itemName}
-                            className="checkout-img"
-                        />
-
-                        <div>
-                            <p className="item-title">{item.itemName}</p>
-                            <p className="item-desc">
-                                Qty: {item.quantityCount} x {item.quantityValue} {item.unit}
-                            </p>
-                        </div>
+            {cartItems.map((item, idx) => (
+                <div className="checkout-item" key={item.itemId || idx}>
+                    <img
+                        src={item.itemImageURL || "https://via.placeholder.com/100"}
+                        alt={item.itemName}
+                        className="checkout-img"
+                    />
+                    <div className="flex-grow">
+                        <p className="item-title">{item.itemName}</p>
+                        <p className="item-desc">
+                            Qty: {item.numOfUnits} x {item.quantity} {item.unit}
+                        </p>
                     </div>
-                ))
-            ) : (
-                <p>No items added yet.</p>
-            )}
+                    {/* <div className="flex gap-2 items-center">
+                        <button onClick={() => onEdit(item)} title="Edit">
+                            ✏️
+                        </button>
+                        <button onClick={() => onDelete(item.itemId)} title="Delete">
+                            🗑️
+                        </button>
+                    </div> */}
+                </div>
+            ))}
+
 
             {/* Tip Section */}
-            <div className="tag-options">
+            <div className="tag-options flex flex-col gap-2 sm:flex-row">
                 <button onClick={() => handleTipChange(10)}>₹10</button>
                 <button onClick={() => handleTipChange(20)}>₹20</button>
                 <button onClick={() => handleTipChange(50)}>₹50</button>
@@ -83,15 +84,15 @@ const CustomCheckout = ({ cartItems = [] }) => {
             )}
 
             {/* Bill Summary */}
-            <div className="bill-summary">
+            <div className="bill-summary flex flex-col">
                 <h5>Bill Summary</h5>
-                <div className="bill-row">
+                <div className="bill-row flex flex-col">
                     <span>Item Total</span>
-                    <span>₹{itemsTotal}</span>
+                    <span className="bill-data">will be updated soon</span>
                 </div>
                 <div className="bill-row">
                     <span>Delivery Charges</span>
-                    <span>₹{deliveryCharge}</span>
+                    <span className="bill-data"> ₹ will be updated soon</span>
                 </div>
                 <div className="bill-row">
                     <span>Surge Charges</span>
@@ -105,7 +106,7 @@ const CustomCheckout = ({ cartItems = [] }) => {
                 </div>
                 <div className="bill-row">
                     <span>Waiting Charges</span>
-                    <span>₹{waitingCharge}</span>
+                    <span>₹ will be updated soon</span>
                 </div>
                 <div className="bill-row">
                     <span>Discount (Promo code)</span>
@@ -113,15 +114,18 @@ const CustomCheckout = ({ cartItems = [] }) => {
                 </div>
                 <div className="bill-row">
                     <span>Taxes & Fees</span>
-                    <span>₹{tax}</span>
+                    <span>₹ will be updated soon</span>
                 </div>
                 <div className="bill-row total">
                     <strong>Grand Total</strong>
-                    <strong>₹{total}</strong>
+                    <strong>₹ will be updated soon</strong>
                 </div>
             </div>
+          
         </div>
+
     );
+
 };
 
 export default CustomCheckout;

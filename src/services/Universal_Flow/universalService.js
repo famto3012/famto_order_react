@@ -153,6 +153,30 @@ try {
 }
 }
 
+
+export const fetchMapplsAuthToken = async (navigate) => {
+
+const token = localStorage.getItem('authToken');
+  try {
+    const response = await axios.get(`${BASE_URL}/token/get-auth-token`,{
+      headers : {
+      Authorization : `Bearer ${token}`
+      },
+      withCredentials: true
+    });
+    // if (!response.ok) throw new Error("Token fetch failed");
+
+    const data = await response.data;
+    console.log("Mappls Token Response:", data.data); // ✅ Add this
+
+    return data?.data; // or adjust based on your response structure
+  } catch (error) {
+    console.error("Error fetching Mappls token:", error);
+    // navigate("/error"); // optional redirect if token fails
+    return null;
+  }
+};
+
 export const fetchBill = async (cartId, token) => {
   try {
     const response = await axios.get(
