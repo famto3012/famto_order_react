@@ -65,3 +65,59 @@ export const updateItem = async (itemId, payload) => {
 
     return false;
 };
+
+export const addAddressData = async (payload) => {
+    const token = localStorage.getItem(`authToken`);
+    try {
+        const data = await axios.post(`${BASE_URL}/customers/add-delivery-address`, {
+            deliveryAddressType: payload.selectedAddress.addressType,
+            instructionsInAgent: payload.instructions
+        }, {
+            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        if (data.status === 200) {
+            console.log('Add Delviery Address', data.data);
+            return data.data;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+export const confirmCustomOrder = async (cartId) => {
+    console.log("Cart ID in controller", cartId);
+    const token = localStorage.getItem(`authToken`);
+    try {
+        const response = await axios.post(`${BASE_URL}/customers/confirm-custom-order`, {
+            cartId: cartId
+        }, {
+            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+
+    }
+}
+
+export const getCartItems = async (itemId) => {
+    const token = localStorage.getItem(`authToken`);
+    try {
+        const response = await axios.get(`${BASE_URL}/customers/get-item/${itemId}`, {
+            headers: {
+                Authorization: `Bearer ${token}` 
+            },
+            withCredentials: true
+        })
+        return response.data;
+    } catch (error) {
+        console.log(`Error in fetch item cart`);
+    }
+}

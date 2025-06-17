@@ -10,6 +10,7 @@ import ProductList from "./Pages/Universal_Flow/ProductList";
 import CheckoutPage from "./Pages/Universal_Flow/CheckoutPage";
 import Custom_Order from "./Pages/CustomOrder/Custom_Order";
 import Order_Confirm from "./Pages/Universal_Flow/Order_Confirm";
+import CustomCheckout from "./Pages/Components/CustomCheckout";
 
 function App() {
   return(
@@ -25,6 +26,8 @@ function App() {
       <Route path="/custom-order" element={<Custom_Order />} />
       <Route path="/checkout-page" element={<CheckoutPage />} />
       <Route path="/order-confirm" element={<Order_Confirm />} />
+      <Route path="/custom-checkout" element={<CustomCheckout />} />
+
     </Routes>
     </BrowserRouter>
   )

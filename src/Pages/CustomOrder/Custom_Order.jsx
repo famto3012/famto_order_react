@@ -4,7 +4,7 @@ import "../../styles/Universal_Flow/CustomOrderStyles.css";
 import Address from "../Components/Address";
 import { useNavigate } from "react-router-dom";
 import MapModal from "../Mappls/MapModal";
-import { addItem, addShop, updateItem } from "../../services/Custom_Order/customOrderService";
+import { addAddressData, addItem, addShop, updateItem } from "../../services/Custom_Order/customOrderService";
 
 const CustomOrder = () => {
     const [itemName, setItemName] = useState("");
@@ -24,48 +24,48 @@ const CustomOrder = () => {
     const [isShopSaved, setIsShopSaved] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editItemData, setEditItemData] = useState(null);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [saveButtonClicked, setSaveButtonClicked] = useState(false);
+    const [cartId, setCartId] = useState(null);
+    const [showAddForm, setShowAddForm] = useState(cartItems.length === 0);
 
+   const handleAddToCart = async () => {
+    if (!itemName) return alert("Please enter item name");
 
-    const handleAddToCart = async () => {
-        if (!itemName) return alert("Please enter item name");
-
-        const itemPayload = {
-            itemName,
-            quantity,
-            numOfUnits,
-            unit,
-            instructions,
-            itemImageURL: imageFile ? URL.createObjectURL(imageFile) : null,
-            source: selectedSource,
-            store: selectedSource === "map" ? store : null,
-            place: selectedSource === "map" ? place : null,
-        };
-
-        const result = await addItem(itemPayload);
-
-        if (result) {
-            console.log("Item response",result);
-            const newItem = {
-                ...itemPayload,
-                itemId: result.itemId,
-            };
-
-            setCartItems([...cartItems, newItem]);
-
-            // Clear fields
-            setItemName("");
-            setQuantityCount(1);
-            setQuantityValue("");
-            setUnit("gm");
-            setInstructions("");
-            setImageFile(null);
-            setStore("");
-            setPlace("");
-            document.getElementById("imageUpload").value = "";
-        } else {
-            alert("Failed to add item");
-        }
+    const itemPayload = {
+        itemName,
+        quantity,
+        numOfUnits,
+        unit,
+        instructions,
+        itemImageURL: imageFile ? URL.createObjectURL(imageFile) : null,
+        source: selectedSource,
+        store: selectedSource === "map" ? store : null,
+        place: selectedSource === "map" ? place : null,
     };
+
+    const result = await addItem(itemPayload);
+
+    if (result && Array.isArray(result.items)) {
+        console.log("Item response", result);
+
+        // Replace cart with the updated items
+        setCartItems(result.items);
+
+        // Clear input fields
+        setItemName("");
+        setQuantityCount(1);
+        setQuantityValue("");
+        setUnit("gm");
+        setInstructions("");
+        setImageFile(null);
+        setStore("");
+        setPlace("");
+        document.getElementById("imageUpload").value = "";
+    } else {
+        alert("Failed to add item");
+    }
+};
 
 
     const handleLocationSelect = ({ lat, lng }) => {
@@ -110,6 +110,19 @@ const CustomOrder = () => {
     };
 
 
+    const handleSave = async () => {
+        const payload = {
+            selectedAddress,
+            instructions
+        }
+
+        const response = await addAddressData(payload);
+        setSaveButtonClicked(true);
+        console.log(response);
+        setCartId(response?.cartId);
+        navigate('/custom-checkout')
+        console.log(response?.cartId);
+    }
 
     const handleAnywhereShopSave = async () => {
         const payload = {
@@ -125,13 +138,12 @@ const CustomOrder = () => {
         <div className="custom-order-container flex flex-col md:flex-row">
             <div className="order-section">
                 {selectedSource === null && (
-                    <div className="flex flex-col justify-center items-center mb-4">
+                    <div className="flex flex-row gap-6 justify-center items-center mb-4">
                         <button
                             className="primary-btn"
                             onClick={() => {
-                                 handleAnywhereShopSave();
+                                handleAnywhereShopSave();
                                 setSelectedSource("anywhere");
-                               
                             }
                             }
                         >
@@ -199,54 +211,81 @@ const CustomOrder = () => {
                     </div>
                 )}
 
-                <div className="form-group">
-                    <label>Item Name</label>
-                    <input
-                        type="text"
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
-                        placeholder="Enter item name"
-                    />
+                <div className="bg-gray-100 p-6 rounded-lg">
+
+                    <div className="form-group">
+                        <label>Item Name</label>
+                        <input
+                            type="text"
+                            value={itemName}
+                            onChange={(e) => setItemName(e.target.value)}
+                            placeholder="Enter item name"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Number of Qnty</label>
+                        <input
+                            type="number"
+                            min="1"
+                            value={quantity}
+                            onChange={(e) => setQuantityCount(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-group quantity-group">
+                        <label>Quantity</label>
+                        <input
+                            type="text"
+                            value={numOfUnits}
+                            onChange={(e) => setQuantityValue(e.target.value)}
+                            placeholder="Enter Quantity"
+                        />
+                        <span className="unit">{unit}</span>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Upload Image</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImageFile(e.target.files[0])}
+                            id="imageUpload"
+                        />
+                    </div>
+
+                    <div className="action-buttons flex">
+                        <button className="secondary-btn" onClick={handleAddToCart}>
+                            Save Items
+                        </button>
+                    </div>
                 </div>
 
-                <div className="form-group">
-                    <label>Number of Qnty</label>
-                    <input
-                        type="number"
-                        min="1"
-                        value={quantity}
-                        onChange={(e) => setQuantityCount(e.target.value)}
-                    />
-                </div>
+                {cartItems.map((item, idx) => (
+                    <div className="checkout-item" key={item.itemId || idx}>
+                        <img
+                            src={item.itemImageURL || "https://i.sstatic.net/y9DpT.jpg"}
+                            alt={item.itemName}
+                            className="checkout-img"
+                        />
+                        <div className="flex-grow">
+                            <p className="item-title">{item.itemName}</p>
+                            <p className="item-desc">
+                                Qty: {item.numOfUnits} x {item.quantity} {item.unit}
+                            </p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <button onClick={() => onEdit(item)} title="Edit">
+                                ✏️
+                            </button>
+                            <button onClick={() => handleDeleteItem(item.itemId)} title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                ))}
 
-                <div className="form-group quantity-group">
-                    <label>Quantity</label>
-                    <input
-                        type="text"
-                        value={numOfUnits}
-                        onChange={(e) => setQuantityValue(e.target.value)}
-                        placeholder="Enter Quantity"
-                    />
-                    <span className="unit">{unit}</span>
-                </div>
-
-                <div className="form-group">
-                    <label>Upload Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setImageFile(e.target.files[0])}
-                        id="imageUpload"
-                    />
-                </div>
-
-                <div className="action-buttons">
-                    <button className="secondary-btn" onClick={handleAddToCart}>
-                        Save Items
-                    </button>
-                </div>
-
-                <Address />
+                <Address onSelectAddress={(address) => setSelectedAddress(address)} />
 
                 <input
                     type="text"
@@ -255,13 +294,20 @@ const CustomOrder = () => {
                     value={instructions}
                     onChange={(e) => setInstructions(e.target.value)}
                 />
+
+                <div className="flex justify-center mt-6">
+                    <button className="bg-[#00ced1] p-4 rounded-full text-lg" onClick={() => { handleSave() }}>
+                        Save Details
+                    </button>
+                </div>
             </div>
 
-            <CustomCheckout
+            {/* <CustomCheckout
                 cartItems={cartItems}
                 onEdit={handleEditItem}
                 onDelete={handleDeleteItem}
-            />
+                cartId={cartId}
+            /> */}
 
 
             <MapModal

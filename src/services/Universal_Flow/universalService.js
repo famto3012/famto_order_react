@@ -98,10 +98,10 @@ export const sendItemData = async (payload) => {
       }
     );
 
-    console.log('Status code',response.status);
+    console.log('Status code', response.status);
 
-    if(response.status == 401) {
-         throw new Error("User not authenticated");
+    if (response.status == 401) {
+      throw new Error("User not authenticated");
     }
     return response.data;
   } catch (error) {
@@ -111,56 +111,56 @@ export const sendItemData = async (payload) => {
 };
 export const updateItemData = async (productId, newQuantity, variantTypeId) => {
   const token = localStorage.getItem('authToken');
-  try{
-    const response = await axios.put(`${BASE_URL}/customers/update-cart`,{
-      productId : productId,
-      quantity : newQuantity,
-      variantTypeId : variantTypeId
-    },{
+  try {
+    const response = await axios.put(`${BASE_URL}/customers/update-cart`, {
+      productId: productId,
+      quantity: newQuantity,
+      variantTypeId: variantTypeId
+    }, {
       withCredentials: true,
-      headers : {
-        Authorization : `Bearer ${token}`
+      headers: {
+        Authorization: `Bearer ${token}`
       }
     });
-    console.log('Update Items',response.status);
+    console.log('Update Items', response.status);
     return response.data;
-  } catch (error){
-    console.log("error in update items",error);
+  } catch (error) {
+    console.log("error in update items", error);
   }
 }
 
 
-export const updateCartDetail = async(payload) => {
-const token = localStorage.getItem('authToken');
-console.log('Pay load',payload);
-try {
-  const response = await axios.post(`${BASE_URL}/customers/cart/add-details`,{
-    businessCategoryId: payload.businessCategoryId,
-    instructionToMerchant : payload.merchantInstruction,
-    instructionToDeliveryAgent : payload.customerNote,
-    deliveryMode: payload.orderType,
-    deliveryAddressType : "home"
-  },{
-    headers: {
-      Authorization : `Bearer ${token}`
-    },
-    withCredentials: true
-  })
-  console.log(response.data);
-  return response.data;
-} catch (error) {
-  
-}
+export const updateCartDetail = async (payload) => {
+  const token = localStorage.getItem('authToken');
+  console.log('Pay load', payload);
+  try {
+    const response = await axios.post(`${BASE_URL}/customers/cart/add-details`, {
+      businessCategoryId: payload.businessCategoryId,
+      instructionToMerchant: payload.merchantInstruction,
+      instructionToDeliveryAgent: payload.customerNote,
+      deliveryMode: payload.orderType,
+      deliveryAddressType: payload.selectedAddress.addressType
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true
+    })
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+
+  }
 }
 
 
 export const fetchMapplsAuthToken = async (navigate) => {
 
-const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('authToken');
   try {
-    const response = await axios.get(`${BASE_URL}/token/get-auth-token`,{
-      headers : {
-      Authorization : `Bearer ${token}`
+    const response = await axios.get(`${BASE_URL}/token/get-auth-token`, {
+      headers: {
+        Authorization: `Bearer ${token}`
       },
       withCredentials: true
     });
@@ -221,7 +221,7 @@ export const confirmOrder = async (paymentMode, token) => {
         amount: null,
       };
     }
-console.log("hai",response.data.order_id);
+    console.log("hai", response.data.order_id);
 
     return response.data;
   } catch (err) {
@@ -257,8 +257,8 @@ export const verifyPayment = async (orderId, amount, token) => {
           );
 
           if (res.status === 200) {
-            resolve(res.data); 
-            console.log("helo",res.data.orderId);// ✅ Only return result, don't navigate
+            resolve(res.data);
+            console.log("helo", res.data.orderId);// ✅ Only return result, don't navigate
           } else {
             reject(new Error("Backend verification failed"));
           }

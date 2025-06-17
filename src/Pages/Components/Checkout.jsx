@@ -224,9 +224,8 @@ const Checkout = () => {
           {confirmationData?.items?.map((item, idx) => (
             <div
               key={idx}
-              className={`flex justify-between items-center px-2 py-3 rounded ${
-                idx % 2 === 0 ? "bg-gray-100" : "bg-white"
-              }`}
+              className={`flex justify-between items-center px-2 py-3 rounded ${idx % 2 === 0 ? "bg-gray-100" : "bg-white"
+                }`}
             >
               <span>{item.itemName}</span>
               <span>
@@ -264,11 +263,10 @@ const Checkout = () => {
                 <button
                   key={tip}
                   onClick={() => handleTipSelect(tip)}
-                  className={`flex-1 rounded-lg py-2 ${
-                    selectedTip === tip
-                      ? "bg-[#00CED1] text-white"
-                      : "bg-gray-200 text-black"
-                  }`}
+                  className={`flex-1 rounded-lg py-2 ${selectedTip === tip
+                    ? "bg-[#00CED1] text-white"
+                    : "bg-gray-200 text-black"
+                    }`}
                 >
                   ₹ {tip}
                 </button>
@@ -276,7 +274,7 @@ const Checkout = () => {
 
               {/* If custom tip is selected, show it */}
               {typeof selectedTip === "number" &&
-              !presetTips.includes(selectedTip) ? (
+                !presetTips.includes(selectedTip) ? (
                 <button
                   onClick={handleCustomTipClick}
                   className="flex-1 bg-[#00CED1] text-white rounded-lg py-2"
@@ -467,9 +465,8 @@ const Checkout = () => {
         <div className="mt-4">
           <h3 className="text-gray-700 font-medium">Pay</h3>
           <button
-            className={`px-4 py-2 rounded-lg border ${
-              paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
-            }`}
+            className={`px-4 py-2 rounded-lg border ${paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
+              }`}
             onClick={() => setPaymentMode("Online-payment")}
           >
             Online Payment
