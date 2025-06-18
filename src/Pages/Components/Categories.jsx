@@ -56,36 +56,34 @@ export default function CategoryGrid({
   const [hasSubmittedOnce, setHasSubmittedOnce] = useState(false);
   const [modalImage, setModalImage] = useState("");
 
-useEffect(() => {
-  if (editCategoryId !== null) {
-    setSelectedItem(editCategoryId);
-    setFormData(
-      savedPackages[editCategoryId] || {
-        length: "",
-        width: "",
-        height: "",
-        weight: "",
-      }
-    );
-    setModalImage(categories[editCategoryId].image);
-    setOpen(true);
-    onEditCategoryIdClear(); 
-  }
-}, [editCategoryId]);
-
-useEffect(() => {
-  if (deletedCategoryId !== null) {
-    const updatedData = { ...savedData }; 
-    delete updatedData[deletedCategoryId];
-    setSavedData(updatedData); 
-    if (onSavePackage) {
-      onSavePackage(updatedData);
+  useEffect(() => {
+    if (editCategoryId !== null) {
+      setSelectedItem(editCategoryId);
+      setFormData(
+        savedPackages[editCategoryId] || {
+          length: "",
+          width: "",
+          height: "",
+          weight: "",
+        }
+      );
+      setModalImage(categories[editCategoryId].image);
+      setOpen(true);
+      onEditCategoryIdClear();
     }
-    onDeleteCategoryIdClear();
-  }
-}, [deletedCategoryId]);
+  }, [editCategoryId]);
 
-
+  useEffect(() => {
+    if (deletedCategoryId !== null) {
+      const updatedData = { ...savedData };
+      delete updatedData[deletedCategoryId];
+      setSavedData(updatedData);
+      if (onSavePackage) {
+        onSavePackage(updatedData);
+      }
+      onDeleteCategoryIdClear();
+    }
+  }, [deletedCategoryId]);
 
   const handleOpen = (index) => {
     setSelectedItem(index);
@@ -224,11 +222,23 @@ useEffect(() => {
           "pickUpAddressType",
           pickupAddress.addressType || ""
         );
+        if (pickupAddress.addressType === "other") {
+          formDataToSend.append(
+            "pickUpAddressOtherAddressId",
+            pickupAddress.id || ""
+          );
+        }
         formDataToSend.append("instructionInPickup", pickupInstructions || "");
         formDataToSend.append(
           "deliveryAddressType",
           dropAddress.addressType || ""
         );
+        if (dropAddress.addressType === "other") {
+          formDataToSend.append(
+            "deliveryAddressOtherAddressId",
+            dropAddress.id || ""
+          );
+        }
         formDataToSend.append(
           "instructionInDelivery",
           deliveryInstructions || ""
@@ -249,7 +259,7 @@ useEffect(() => {
 
           const charges = await fetchVehicleCharges(token, response.cartId);
           if (vehicleChargesCallback) {
-            vehicleChargesCallback(charges); // Send to parent
+            vehicleChargesCallback?.(charges); // Send to parent
           }
         }
 
@@ -269,14 +279,14 @@ useEffect(() => {
 
         const response = await submitUpdateItemRequest(itemsArray, token);
         if (response?.updatedCart?._id) {
-          onCartIdReceived && onCartIdReceived(response.updatedCart._id);
+          onCartIdReceived?.(response.updatedCart._id);
 
           const charges = await fetchVehicleCharges(
             token,
             response.updatedCart._id
           );
           if (vehicleChargesCallback) {
-            vehicleChargesCallback(charges); // Send to parent
+            vehicleChargesCallback?.(charges); // Send to parent
           }
         }
         console.log("update", response.updatedCart._id);
