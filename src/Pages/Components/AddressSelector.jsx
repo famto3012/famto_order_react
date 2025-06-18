@@ -6,9 +6,17 @@ import MapsHomeWorkOutlinedIcon from "@mui/icons-material/MapsHomeWorkOutlined";
 import { useEffect } from "react";
 import { fetchCustomerAddress } from "../../services/Pick_Drop/pickdropService";
 
-const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  onPickupInstructionChange = () => {},onDeliveryInstructionChange = () => {}, }) => {
+const AddressSelector = ({
+  onPickupSelect = () => {},
+  onDropSelect = () => {},
+  onPickupInstructionChange = () => {},
+  onDeliveryInstructionChange = () => {},
+}) => {
   const [selectedPickup, setSelectedPickup] = useState(null);
   const [selectedDrop, setSelectedDrop] = useState(null);
+  const [selectedPickupOtherId, setSelectedPickupOtherId] = useState(null);
+  const [selectedDropOtherId, setSelectedDropOtherId] = useState(null);
+
   const [formVisible, setFormVisible] = useState(false);
   const [addressList, setAddressList] = useState({
     Home: null,
@@ -34,6 +42,8 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
       const token = localStorage.getItem("authToken");
       if (!token) return;
       const res = await fetchCustomerAddress(token);
+      console.log(res);
+
       const formatted = {
         Home: res.homeAddress
           ? {
@@ -57,6 +67,7 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
           : null,
         Others:
           res.otherAddress?.map((addr) => ({
+            id: addr._id || addr.id, // Use _id directly if available
             fullName: addr.fullName,
             phone: addr.phoneNumber,
             flat: addr.flat,
@@ -70,35 +81,83 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
     loadAddresses();
   }, []);
 
-  const handleSelectPickup = (type) => {
-    const address =
-      type === "home"
-        ? addressList.Home
-        : type === "work"
-        ? addressList.Work
-        : addressList.Others[0]; // you can allow choosing specific one if multiple
+  // const handleSelectPickup = (type) => {
+  //   const address =
+  //     type === "home"
+  //       ? addressList.Home
+  //       : type === "work"
+  //       ? addressList.Work
+  //       : addressList.Others[0]; // you can allow choosing specific one if multiple
 
-    const isSelected = selectedPickup === type ? null : type;
-    setSelectedPickup(isSelected);
-    setSelectedDrop(isSelected === selectedDrop ? null : selectedDrop);
-    onPickupSelect?.(isSelected ? address : null);
+  //   const isSelected = selectedPickup === type ? null : type;
+  //   setSelectedPickup(isSelected);
+  //   setSelectedDrop(isSelected === selectedDrop ? null : selectedDrop);
+  //   onPickupSelect?.(isSelected ? address : null);
+  // };
+
+  // const handleSelectDrop = (type) => {
+  //   if (type === selectedPickup) return;
+  //   const address =
+  //     type === "home"
+  //       ? addressList.Home
+  //       : type === "work"
+  //       ? addressList.Work
+  //       : addressList.Others[0];
+
+  //   const isSelected = selectedDrop === type ? null : type;
+  //   setSelectedDrop(isSelected);
+  //   onDropSelect?.(isSelected ? address : null);
+  // };
+
+  const handleSelectPickup = (type, id = null) => {
+    if (type === "other" && id != null) {
+      const selectedAddr = addressList.Others.find((addr) => addr.id === id);
+      setSelectedPickup("other");
+      setSelectedPickupOtherId(id);
+      console.log("hai", selectedAddr.id);
+      onPickupSelect(selectedAddr);
+      return;
+    } else {
+      const address =
+        type === "home"
+          ? addressList.Home
+          : type === "work"
+          ? addressList.Work
+          : null;
+
+      const isSelected = selectedPickup === type ? null : type;
+      setSelectedPickup(isSelected);
+      setSelectedPickupOtherId(null);
+      setSelectedDrop(isSelected === selectedDrop ? null : selectedDrop);
+      onPickupSelect?.(isSelected ? address : null);
+    }
   };
 
-  const handleSelectDrop = (type) => {
-    if (type === selectedPickup) return;
-    const address =
-      type === "home"
-        ? addressList.Home
-        : type === "work"
-        ? addressList.Work
-        : addressList.Others[0];
+  const handleSelectDrop = (type, id = null) => {
+     if (type === selectedPickup && id === selectedPickupOtherId) return;
 
-    const isSelected = selectedDrop === type ? null : type;
-    setSelectedDrop(isSelected);
-    onDropSelect?.(isSelected ? address : null);
+    if (type === "other" && id != null) {
+      const selectedAddr = addressList.Others.find((addr) => addr.id === id);
+      setSelectedDrop("other");
+      setSelectedDropOtherId(id);
+      onDropSelect(selectedAddr);
+      return;
+    } else {
+      const address =
+        type === "home"
+          ? addressList.Home
+          : type === "work"
+          ? addressList.Work
+          : null;
+
+      const isSelected = selectedDrop === type ? null : type;
+      setSelectedDrop(isSelected);
+      setSelectedDropOtherId(null);
+      onDropSelect?.(isSelected ? address : null);
+    }
   };
 
-    const handleInstructionChange = (e) => {
+  const handleInstructionChange = (e) => {
     const { name, value } = e.target;
     setInstructionData({ ...instructionData, [name]: value });
 
@@ -168,11 +227,27 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
       {/* Buttons Row */}
       <div className="flex items-center justify-between  ">
         {[
-          {label: "HOME", type: "home", icon: <HomeOutlinedIcon fontSize="large" /> },
-          {label: "WORK",type: "work", icon: <WorkOutlineOutlinedIcon fontSize="large" /> },
-          {label: "OTHERS",type: "other",icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,},
-          {label: "ADD",type: "add", icon: <AddLocationAltOutlinedIcon fontSize="large" />},
-        ].map(({ type, icon,label }) => (
+          {
+            label: "HOME",
+            type: "home",
+            icon: <HomeOutlinedIcon fontSize="large" />,
+          },
+          {
+            label: "WORK",
+            type: "work",
+            icon: <WorkOutlineOutlinedIcon fontSize="large" />,
+          },
+          {
+            label: "OTHERS",
+            type: "other",
+            icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
+          },
+          {
+            label: "ADD",
+            type: "add",
+            icon: <AddLocationAltOutlinedIcon fontSize="large" />,
+          },
+        ].map(({ type, icon, label }) => (
           <button
             key={type}
             type="button"
@@ -302,18 +377,26 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
 
       {selectedPickup === "other" && addressList.Others.length > 0 && (
         <div className="mt-4 space-y-2">
-          {addressList.Others.map((addr, index) => (
-            <div
-              key={index}
-              className="p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left"
-            >
-              <p className="font-semibold">{addr.fullName}</p>
-              <p className="text-gray-600">{addr.phone}</p>
-              <p className="text-gray-600">
-                {addr.flat}, {addr.street}, {addr.nearby}
-              </p>
-            </div>
-          ))}
+          {addressList.Others.map((addr,index) => {
+            const isSelected = selectedPickupOtherId === addr.id;
+            return (
+              <div
+                key={addr.id || index}
+                onClick={() => handleSelectPickup("other", addr.id)}
+                className={`p-4 border  rounded-xl text-left cursor-pointer ${
+                  isSelected
+                    ? "bg-[#EFFFFF] border-[#00ced1]"
+                    : "bg-gray-50 border-gray-300"
+                }`}
+              >
+                <p className="font-semibold">{addr.fullName}</p>
+                <p className="text-gray-600">{addr.phone}</p>
+                <p className="text-gray-600">
+                  {addr.flat}, {addr.street}, {addr.nearby}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -330,11 +413,27 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
           <p className="font-[600] mb-5 text-[24px]">Drop</p>
           <div className="flex items-center justify-between  ">
             {[
-              {label: "HOME", type: "home", icon: <HomeOutlinedIcon fontSize="large" /> },
-              {label: "WORK", type: "work", icon: <WorkOutlineOutlinedIcon fontSize="large" />,},
-              {label: "OTHERS",type: "other",icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,},
-              {label: "ADD",type: "add",icon: <AddLocationAltOutlinedIcon fontSize="large" />,},
-            ].map(({ type, icon,label }) => (
+              {
+                label: "HOME",
+                type: "home",
+                icon: <HomeOutlinedIcon fontSize="large" />,
+              },
+              {
+                label: "WORK",
+                type: "work",
+                icon: <WorkOutlineOutlinedIcon fontSize="large" />,
+              },
+              {
+                label: "OTHERS",
+                type: "other",
+                icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
+              },
+              {
+                label: "ADD",
+                type: "add",
+                icon: <AddLocationAltOutlinedIcon fontSize="large" />,
+              },
+            ].map(({ type, icon, label }) => (
               <button
                 key={type}
                 type="button"
@@ -377,18 +476,29 @@ const AddressSelector = ({ onPickupSelect = () => {}, onDropSelect = () => {},  
 
       {selectedDrop === "other" && addressList.Others.length > 0 && (
         <div className="mt-4 space-y-2">
-          {addressList.Others.map((addr, index) => (
-            <div
-              key={index}
-              className="p-4 bg-[#EFFFFF] border border-[#00ced1] rounded-xl text-left"
-            >
-              <p className="font-semibold">{addr.fullName}</p>
-              <p className="text-gray-600">{addr.phone}</p>
-              <p className="text-gray-600">
-                {addr.flat}, {addr.street}, {addr.nearby}
-              </p>
-            </div>
-          ))}
+          {addressList.Others.map((addr) => {
+            const isDisabled = addr.id === selectedPickupOtherId;
+            const isSelected = selectedDropOtherId === addr.id;
+            return (
+              <div
+                key={addr.id}
+                onClick={() =>
+                  !isDisabled && handleSelectDrop("other", addr.id)
+                }
+            className={`p-4 border  rounded-xl text-left cursor-pointer ${
+                  isSelected
+                    ? "bg-[#EFFFFF] border-[#00ced1]"
+                    : "bg-gray-50 border-gray-300"
+                }`}
+              >
+                <p className="font-semibold">{addr.fullName}</p>
+                <p className="text-gray-600">{addr.phone}</p>
+                <p className="text-gray-600">
+                  {addr.flat}, {addr.street}, {addr.nearby}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
 
