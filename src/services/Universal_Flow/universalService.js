@@ -2,7 +2,6 @@ import axios from "axios";
 import BASE_URL from "../../BaseURL";
 import { useNavigate } from "react-router-dom";
 
-
 export const fetchCategories = async (token) => {
   const { data, status } = await axios.post(
     `${BASE_URL}/customers/all-business-categories`,
@@ -13,50 +12,58 @@ export const fetchCategories = async (token) => {
   return [];
 };
 
-export const fetchMerchantCategories = async (merchantId, businessCategoryId, page, limit) => {
+export const fetchMerchantCategories = async (
+  merchantId,
+  businessCategoryId,
+  page,
+  limit
+) => {
   const data = await axios.get(`${BASE_URL}/customers/category`, {
     params: {
       merchantId,
       businessCategoryId,
       page,
-      limit
+      limit,
     },
-    withCredentials: true
+    withCredentials: true,
   });
   console.log("Merchant Categories :", data.data);
   return data.data || [];
-}
+};
 
 export const fetchProducts = async (categoryId, page, limit) => {
   const data = await axios.get(`${BASE_URL}/customers/products`, {
     params: {
       categoryId,
       page,
-      limit
+      limit,
     },
-    withCredentials: true
+    withCredentials: true,
   });
   console.log("Products", data.data);
   return data.data || [];
-}
+};
 
 export const fetchMerchantBanner = async (merchantId) => {
-  const response = await axios.get(`${BASE_URL}/customers/merchant-banner/${merchantId}`, {
-    withCredentials: true
-  });
+  const response = await axios.get(
+    `${BASE_URL}/customers/merchant-banner/${merchantId}`,
+    {
+      withCredentials: true,
+    }
+  );
   console.log("Banner", response);
   return response?.data || [];
-
-}
+};
 
 export const searchProducts = async (merchantId, searchText) => {
   try {
-    const response = await axios.get(`${BASE_URL}/customers/products/filter-and-sort/${merchantId}`, {
-      params: {
-        productName: searchText,
+    const response = await axios.get(
+      `${BASE_URL}/customers/products/filter-and-sort/${merchantId}`,
+      {
+        params: {
+          productName: searchText,
+        },
       }
-    }
-
     );
     console.log("Search Results", response.data);
     return response.data;
@@ -67,20 +74,21 @@ export const searchProducts = async (merchantId, searchText) => {
 
 export const fetchVariants = async (productId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/customers/merchant/product/${productId}/variants`,
+    const response = await axios.get(
+      `${BASE_URL}/customers/merchant/product/${productId}/variants`,
       { withCredentials: true }
-    )
+    );
     console.log("Fetched variants", response.data);
     return response.data;
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const sendItemData = async (payload) => {
   const token = localStorage.getItem("authToken");
 
-  console.log('Token', token);
+  console.log("Token", token);
 
   if (!token) {
     throw new Error("User not authenticated");
@@ -98,7 +106,7 @@ export const sendItemData = async (payload) => {
       }
     );
 
-    console.log('Status code', response.status);
+    console.log("Status code", response.status);
 
     if (response.status == 401) {
       throw new Error("User not authenticated");
@@ -110,59 +118,62 @@ export const sendItemData = async (payload) => {
   }
 };
 export const updateItemData = async (productId, newQuantity, variantTypeId) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   try {
-    const response = await axios.put(`${BASE_URL}/customers/update-cart`, {
-      productId: productId,
-      quantity: newQuantity,
-      variantTypeId: variantTypeId
-    }, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`
+    const response = await axios.put(
+      `${BASE_URL}/customers/update-cart`,
+      {
+        productId: productId,
+        quantity: newQuantity,
+        variantTypeId: variantTypeId,
+      },
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
-    console.log('Update Items', response.status);
+    );
+    console.log("Update Items", response.status);
     return response.data;
   } catch (error) {
     console.log("error in update items", error);
   }
-}
-
+};
 
 export const updateCartDetail = async (payload) => {
-  const token = localStorage.getItem('authToken');
-  console.log('Pay load', payload);
+  const token = localStorage.getItem("authToken");
+  console.log("Pay load", payload);
   try {
-    const response = await axios.post(`${BASE_URL}/customers/cart/add-details`, {
-      businessCategoryId: payload.businessCategoryId,
-      instructionToMerchant: payload.merchantInstruction,
-      instructionToDeliveryAgent: payload.customerNote,
-      deliveryMode: payload.orderType,
-      deliveryAddressType: payload.selectedAddress.addressType
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const response = await axios.post(
+      `${BASE_URL}/customers/cart/add-details`,
+      {
+        businessCategoryId: payload.businessCategoryId,
+        instructionToMerchant: payload.merchantInstruction,
+        instructionToDeliveryAgent: payload.customerNote,
+        deliveryMode: payload.orderType,
+        deliveryAddressType: payload.selectedAddress.addressType,
       },
-      withCredentials: true
-    })
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
     console.log(response.data);
     return response.data;
-  } catch (error) {
-
-  }
-}
-
+  } catch (error) {}
+};
 
 export const fetchMapplsAuthToken = async (navigate) => {
-
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   try {
     const response = await axios.get(`${BASE_URL}/token/get-auth-token`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true
+      withCredentials: true,
     });
     // if (!response.ok) throw new Error("Token fetch failed");
 
@@ -179,18 +190,15 @@ export const fetchMapplsAuthToken = async (navigate) => {
 
 export const fetchBill = async (cartId, token) => {
   try {
-    const response = await axios.get(
-      `${BASE_URL}/customers/get-cart-bill`,
-      {
-        params: {
-          cartId,
-        },
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${BASE_URL}/customers/get-cart-bill`, {
+      params: {
+        cartId,
+      },
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data || [];
   } catch (error) {
     console.error(
@@ -225,7 +233,10 @@ export const confirmOrder = async (paymentMode, token) => {
 
     return response.data;
   } catch (err) {
-    console.error("❌ Order creation failed:", err.response?.data || err.message);
+    console.error(
+      "❌ Order creation failed:",
+      err.response?.data || err.message
+    );
     return { success: false, orderId: null };
   }
 };
@@ -238,7 +249,8 @@ export const verifyPayment = async (orderId, amount, token) => {
       name: "Famto",
       description: "Order Payment",
       order_id: orderId,
-      image: "https://res.cloudinary.com/dcfj1j1ku/image/upload/v1743054538/Group_427320859_y8jszt.svg",
+      image:
+        "https://res.cloudinary.com/dcfj1j1ku/image/upload/v1743054538/Group_427320859_y8jszt.svg",
       handler: async function (response) {
         try {
           const paymentDetails = {
@@ -258,7 +270,7 @@ export const verifyPayment = async (orderId, amount, token) => {
 
           if (res.status === 200) {
             resolve(res.data);
-            console.log("helo", res.data.orderId);// ✅ Only return result, don't navigate
+            console.log("helo", res.data.orderId); // ✅ Only return result, don't navigate
           } else {
             reject(new Error("Backend verification failed"));
           }
@@ -274,3 +286,64 @@ export const verifyPayment = async (orderId, amount, token) => {
     rzp.open();
   });
 };
+
+export const fetchTemporaryOrders = async () => {
+  const token = localStorage.getItem("authToken");
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/customers/get-temporary-order`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (response.status === 200) {
+      console.log("Temporary Orders Fetched Succesfully", response.data);
+      return response.data;
+    } else if (response.status === 401) {
+      console.log("Invalid/Expired Token");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return [];
+};
+
+export const cancelOrderById = async (orderId) => {
+  const token = localStorage.getItem(`authToken`);
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/customers/cancel-universal-order`,
+      {
+        orderId: orderId,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      }
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const getAllOrders = async() => {
+  const token = localStorage.getItem('authToken');
+  try {
+    const response = await axios.get(`${BASE_URL}/customers/orders`,{
+      headers: {
+        Authorization : `Bearer ${token}`
+      }
+    });
+    if(response.status === 200) {
+      console.log(`All-Orders fetched Successfully`);
+    return response.data;
+    } else if(response.status === 401) {
+      console.log(`Invalid/Expire Token`);
+    }
+  } catch (error) {
+    console.log(`Error`);
+  }
+}

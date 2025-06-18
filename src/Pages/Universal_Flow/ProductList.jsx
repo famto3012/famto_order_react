@@ -63,22 +63,28 @@ const ProductList = () => {
     const productData = await fetchProducts(categoryId, 1, 200);
     setProducts(productData?.data || []);
     setSearchText(""); // clear search on category change
-    setTimeout(() => productRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    setTimeout(
+      () => productRef.current?.scrollIntoView({ behavior: "smooth" }),
+      100
+    );
   };
-  const handleSearch = useCallback(async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
+  const handleSearch = useCallback(
+    async (query) => {
+      if (!query.trim()) {
+        setSearchResults([]);
+        return;
+      }
 
-    try {
-      const data = await searchProducts(merchantId, query);
-      setSearchResults(data || []);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setSearchResults([]);
-    }
-  }, [merchantId]);
+      try {
+        const data = await searchProducts(merchantId, query);
+        setSearchResults(data || []);
+      } catch (err) {
+        console.error("Search failed:", err);
+        setSearchResults([]);
+      }
+    },
+    [merchantId]
+  );
 
   // 🚀 Single debounce effect in parent only
   useEffect(() => {
@@ -92,9 +98,7 @@ const ProductList = () => {
   // 🎯 Proper rendering logic
   const productListToRender = searchText.trim() ? searchResults : products;
 
-
-  console.log('Rendering:', productListToRender);
-
+  console.log("Rendering:", productListToRender);
 
   return (
     <main className="flex flex-col md:px-18 px-6 py-5 gap-4 bg-white">
@@ -132,7 +136,10 @@ const ProductList = () => {
         </div>
       </div>
 
-      <FloatingCart merchantId={merchantId} businessCategoryId={businessCategoryId}/>
+      <FloatingCart
+        merchantId={merchantId}
+        businessCategoryId={businessCategoryId}
+      />
     </main>
   );
 };

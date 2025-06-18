@@ -26,7 +26,6 @@ import {
 const Order_Confirm = () => {
   const [paymentMode, setPaymentMode] = useState("");
   const [showPopper, setShowPopper] = useState(false);
-  const subtotal = 95.0;
 
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -37,11 +36,12 @@ const Order_Confirm = () => {
   const [isOther, setIsOther] = useState(false);
   const [customTipInput, setCustomTipInput] = useState("");
   const presetTips = [10, 20, 50];
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [promoCodes, setPromoCodes] = useState([]);
   const [promoexpanded, setPromoExpanded] = useState(false);
   const [loadingPromos, setLoadingPromos] = useState(false);
   const [selectedPromoCode, setSelectedPromoCode] = useState("");
+  const [showApplyButton, setShowApplyButton] = useState(false);
   const toggleDetails = () => setExpanded((prev) => !prev);
   const toggleDetail = () => setPromoExpanded((prev) => !prev);
 
@@ -177,6 +177,7 @@ const Order_Confirm = () => {
       console.log("✅ Promocode removed from backend");
       setSelectedPromoCode("");
       await fetchCharges();
+      setShowPopper(false);
     } catch (error) {
       console.error("❌ Failed to remove promocode:", error);
     }
@@ -192,7 +193,7 @@ const Order_Confirm = () => {
 
       if (paymentMode === "Cash-on-delivery") {
         alert("✅ Order placed. Pay on delivery.");
-        navigate("/home-delivery");
+        navigate("/");
       } else {
         if (!orderId || !amount) return alert("⚠️ Missing payment data.");
 
@@ -201,6 +202,7 @@ const Order_Confirm = () => {
           if (result.success) {
             alert("✅ Payment successful!");
             console.log("Take Away");
+            navigate("/");
             // navigate(`/home-delivery/?orderId=${result.orderId}`); // ✅ Navigate from component
           } else {
             alert("❌ Payment failed");
@@ -317,7 +319,7 @@ const Order_Confirm = () => {
             <div className="gap-4 flex flex-row items-center">
               <FiShoppingBag className="text-3xl font-light text-gray-500" />
               <div className="flex flex-col">
-                <span>Your total bill is ₹{subtotal}</span>
+                <span>Your total bill</span>
                 <p className="text-sm text-gray-500">
                   Including all charges and tax
                 </p>
@@ -339,7 +341,7 @@ const Order_Confirm = () => {
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Surge charges</span>
-                <span>₹{billDetails.originalDeliveryCharge ?? 0}</span>
+                <span>₹{billDetails.surgePrice ?? 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Added Tip</span>
@@ -356,7 +358,11 @@ const Order_Confirm = () => {
               <hr className="border-gray-400" />
               <div className="flex justify-between font-semibold">
                 <span className="font-medium">Grand Total</span>
-                <span>₹{billDetails.discountedGrandTotal}</span>
+                <span>
+                  ₹
+                  {billDetails.discountedGrandTotal ??
+                    billDetails.originalGrandTotal}
+                </span>
               </div>
             </div>
           )}
@@ -448,19 +454,21 @@ const Order_Confirm = () => {
                 </button>
               </div>
             )}
-            {selectedPromoCode && (
-              <button
-                onClick={() => handleApplyPromoCode(selectedPromoCode)}
-                className="bg-[#00CED1] text-white px-12 py-1 rounded-lg relative"
-                disabled={!selectedPromoCode}
-              >
-                Apply
-              </button>
-            )}
+            {showPopper
+              ? null
+              : selectedPromoCode && (
+                  <button
+                    onClick={() => handleApplyPromoCode(selectedPromoCode)}
+                    className="bg-[#00CED1] text-white px-12 py-1 rounded-lg relative"
+                    disabled={!selectedPromoCode}
+                  >
+                    Apply
+                  </button>
+                )}
           </div>
-          {showPopper && (
+          {showApplyButton && (
             <motion.div
-              className="absolute top-[-30px] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-lg shadow-lg"
+              className="absolute top-[30px] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-lg shadow-lg"
               initial={{ scale: 1, y: 30 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0 }}
@@ -473,9 +481,8 @@ const Order_Confirm = () => {
         </div>
 
         {/* Payment Option */}
-
-        <div className="mt-4">
-          <h3 className="text-gray-700 font-medium">Pay</h3>
+        <h3 className="text-gray-700 mt-4 font-medium">Pay as</h3>
+        <div className="mt-2 flex flex-row gap-6">
           <button
             className={`px-4 py-2 mt-4 rounded-lg border ${
               paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
@@ -484,9 +491,9 @@ const Order_Confirm = () => {
           >
             Online Payment
           </button>
-          {orderType === "home-delivery" && (
+          {orderType === "Home Delivery" && (
             <button
-              className={`px-4 py-2 rounded-lg border ${
+              className={`px-4 py-2 mt-4 rounded-lg border ${
                 paymentMode === "Cash-on-delivery"
                   ? "bg-[#00CED1] text-white"
                   : ""
@@ -527,5 +534,4 @@ const Order_Confirm = () => {
   );
 };
 
-Order_Confirm.displayName = "Order_Confirm";
 export default Order_Confirm;
