@@ -7,9 +7,8 @@ import customAnimation from "../assets/custom.json";
 import {
   motion,
   AnimatePresence,
-  useMotionValue,
-  animate,
 } from "framer-motion";
+import { TiShoppingCart } from "react-icons/ti";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -170,6 +169,15 @@ const HomePage = () => {
             </div>
           </div>
         </div>
+        {/* Sticky Icon (e.g., Support, Cart, Chat) */}
+<div
+  className="fixed bottom-4 right-4 z-50 bg-teal-500 hover:bg-teal-600 text-white p-3 rounded-full shadow-lg cursor-pointer transition"
+  onClick={() => navigate('/orders')} // Change route as needed
+  title="Need Help?"
+>
+ <TiShoppingCart size={30}/>
+</div>
+
       </section>
     </main>
   );

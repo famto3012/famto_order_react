@@ -21,7 +21,6 @@ import { FiShoppingBag } from "react-icons/fi";
 const Checkout = () => {
   const [paymentMode, setPaymentMode] = useState("");
   const [showPopper, setShowPopper] = useState(false);
-  const subtotal = 95.0;
 
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ const Checkout = () => {
   const [isOther, setIsOther] = useState(false);
   const [customTipInput, setCustomTipInput] = useState("");
   const presetTips = [10, 20, 50];
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [promoCodes, setPromoCodes] = useState([]);
   const [promoexpanded, setPromoExpanded] = useState(false);
   const [loadingPromos, setLoadingPromos] = useState(false);
@@ -306,7 +305,7 @@ const Checkout = () => {
             <div className="gap-4 flex flex-row items-center">
               <FiShoppingBag className="text-3xl font-light text-gray-500" />
               <div className="flex flex-col">
-                <span>Your total bill is ₹{subtotal}</span>
+                <span>Your total bill</span>
                 <p className="text-sm text-gray-500">
                   Including all charges and tax
                 </p>

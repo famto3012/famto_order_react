@@ -55,19 +55,23 @@ const Pick_Drop = () => {
       alert("You're not logged in.");
       return;
     }
+    const vehicleType =  selectedVehicle.vehicleType;  
+    const deliveryCharges =  selectedVehicle.deliveryCharges;  
+    const surgeCharges =  selectedVehicle.surgeCharges || 0;  
     try {
       const response = await confirmVehicleTypeandCharge(
-        selectedVehicle.vehicleType,
-        selectedVehicle.deliveryCharges,
-        selectedVehicle.surgeCharges,
+        vehicleType,
+        deliveryCharges,
+        surgeCharges,
         token
       );
       navigate("/checkout", { state: { confirmationData: response } });
       console.log("API success:", response);
       console.log(
-        selectedVehicle.vehicleType,
-        selectedVehicle.deliveryCharges,
-        selectedVehicle.surgeCharges
+        vehicleType,
+        deliveryCharges,
+        surgeCharges,
+        token
       );
     } catch (err) {
       console.error("API call failed", err);
