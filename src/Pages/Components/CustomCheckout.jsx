@@ -1,29 +1,33 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/Universal_Flow/CustomOrderStyles.css";
 import {
+  addCustomTipPromo,
   confirmCustomOrder,
   fetchCustomCartBill,
 } from "../../services/Custom_Order/customOrderService";
 import { FiShoppingBag } from "react-icons/fi";
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
 import { LuSquareChevronRight } from "react-icons/lu";
 import { LuSquareChevronDown } from "react-icons/lu";
-import { Card, CardContent } from "@mui/material";
+import { Card, CardContent, Popper } from "@mui/material";
 import { GrDownload } from "react-icons/gr";
 import { useMutation } from "@tanstack/react-query";
 import {
   applyPromocode,
   applyTip,
-  confirmPickAndDropOrder,
   fetchAvailablePromocode,
-  fetchBillCharges,
   removePromocode,
-  verifyPickAndDropPayment,
 } from "../../services/Pick_Drop/pickdropService";
-import { useLocation } from "react-router-dom";
-import { fetchBill } from "../../services/Universal_Flow/universalService";
+import { useLocation, useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
 
-const CustomCheckout = ({ cartItems = [], cartId }) => {
+const CustomCheckout = ({}) => {
+  const navigate = useNavigate();
   const { state } = useLocation();
+  const cartId = state?.cartId;
   const [selectedTip, setSelectedTip] = useState(20);
   const confirmationData = state?.confirmationData;
   const [isOtherTip, setIsOtherTip] = useState(false);
@@ -34,11 +38,13 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
   const [loadingPromos, setLoadingPromos] = useState(false);
   const [promoCodes, setPromoCodes] = useState([]);
   const [billData, setBillData] = useState([]);
+  const PRESET_TIPS = [10, 20, 50];
 
   useEffect(() => {
     const fetchBillData = async () => {
       try {
         const data = await fetchCustomCartBill(cartId);
+        console.log("ID",cartId);
         setBillData(data);
       } catch (error) {
         console.log("Error in fetch custom Bill");
@@ -66,7 +72,7 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
     try {
       const res = await applyPromocode(
         confirmationData.cartId,
-        orderType,
+        "Custom Order",
         promoCode,
         token
       );
@@ -77,7 +83,7 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
 
       // Optionally set the applied code visually
       setSelectedPromoCode(promoCode);
-      await fetchCharges();
+      // await fetchCharges();
     } catch (err) {
       console.error("❌ Failed to save promocode:", err);
     }
@@ -159,7 +165,7 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
       console.log("Tip selected:", tip);
 
       // Example backend call — you should replace or define `applyTip` and `fetchCharges`
-      // await applyTip(cartId, "custom-order", tip, token);
+      await addCustomTipPromo(cartId, "custom-order", tip, token);
       // await fetchCharges();
     } catch (err) {
       console.error("❌ Failed to save tip:", err);
@@ -178,16 +184,10 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
 
   const handleConfirmOrder = async () => {
     console.log("Confirming order for cartId:", cartId);
-    await confirmCustomOrder(cartId);
+    const data = await confirmCustomOrder(cartId);
+      navigate('/');
+    
   };
-
-  const grandTotal =
-    DELIVERY_CHARGE +
-    SURGE_CHARGE +
-    WAITING_CHARGE +
-    selectedTip +
-    TAX -
-    DISCOUNT;
 
   return (
     <div className="checkout-box">
@@ -247,15 +247,15 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
         </div>
         <div className="bill-row">
           <span>Delivery Charges</span>
-          <span>₹ {DELIVERY_CHARGE}</span>
+          <span>will be updated soon</span>
         </div>
         <div className="bill-row">
           <span>Surge Charges</span>
-          <span>₹ {SURGE_CHARGE}</span>
+          <span>₹ {billData.totalSurge}</span>
         </div>
         <div className="bill-row">
           <span>Waiting Charges</span>
-          <span>₹ {WAITING_CHARGE}</span>
+          <span>₹ will be updated soon</span>
         </div>
         <div className="bill-row">
           <span>Tip</span>
@@ -263,15 +263,15 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
         </div>
         <div className="bill-row">
           <span>Discount (Promo Code)</span>
-          <span>-₹ {DISCOUNT}</span>
+          <span>-₹ </span>
         </div>
         <div className="bill-row">
           <span>Taxes & Fees</span>
-          <span>₹ {TAX}</span>
+          <span>₹ 0</span>
         </div>
         <div className="bill-row total">
           <strong>Grand Total</strong>
-          <strong>₹ {grandTotal}</strong>
+          <strong>₹ will be udpated soon</strong>
         </div>
       </div>
 
@@ -367,7 +367,7 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
             </button>
           )}
         </div>
-        {showPopper && (
+        {/* {showPopper && (
           <motion.div
             className="absolute top-[-30px] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-lg shadow-lg"
             initial={{ scale: 1, y: 30 }}
@@ -375,10 +375,10 @@ const CustomCheckout = ({ cartItems = [], cartId }) => {
             exit={{ scale: 0 }}
             transition={{ duration: 3.3 }}
           >
-            <Lottie animationData={popper} className="bg-transparent" />
+            <Lottie animationData={Popper} className="bg-transparent" />
             🎉 Promo Applied!
           </motion.div>
-        )}
+        )} */}
       </div>
 
       {/* Confirm Order Button */}

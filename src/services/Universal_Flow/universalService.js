@@ -328,22 +328,42 @@ export const cancelOrderById = async (orderId) => {
   }
 };
 
-
-export const getAllOrders = async() => {
-  const token = localStorage.getItem('authToken');
+export const getAllOrders = async () => {
+  const token = localStorage.getItem("authToken");
   try {
-    const response = await axios.get(`${BASE_URL}/customers/orders`,{
+    const response = await axios.get(`${BASE_URL}/customers/orders`, {
       headers: {
-        Authorization : `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    if(response.status === 200) {
+    if (response.status === 200) {
       console.log(`All-Orders fetched Successfully`);
-    return response.data;
-    } else if(response.status === 401) {
+      return response.data;
+    } else if (response.status === 401) {
       console.log(`Invalid/Expire Token`);
     }
   } catch (error) {
     console.log(`Error`);
   }
-}
+};
+
+export const fetchCustomerCart = async () => {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await axios.get(`${BASE_URL}/customers/get-cart`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.status === 200) {
+      console.log("Cart Data",response.data);
+      return response.data;
+    } else if (response.status === 401) {
+      console.log(`Invalid/ Expired Token`);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

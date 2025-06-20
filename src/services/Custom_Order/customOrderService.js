@@ -77,7 +77,7 @@ export const addAddressData = async (payload) => {
       `${BASE_URL}/customers/add-delivery-address`,
       {
         deliveryAddressType: payload.selectedAddress.addressType,
-        instructionsInAgent: payload.instructions,
+        instructionInDelivery: payload.instructions,
       },
       {
         withCredentials: true,
@@ -112,6 +112,9 @@ export const confirmCustomOrder = async (cartId) => {
       }
     );
     console.log(response.data);
+    if(response.status === 200) {
+      return response.status
+    }
     return response.data;
   } catch (error) {}
 };
@@ -135,13 +138,36 @@ export const getCartItems = async (itemId) => {
 };
 
 export const fetchCustomCartBill = async (cartId) => {
+  console.log("cartId in controller",cartId);
+  const token = localStorage.getItem("authToken");
   try {
     const response = await axios.get(`${BASE_URL}/customers/custom-cart-bill`, {
       params: { cartId },
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.status === 200 ? response.data : null;
   } catch (err) {
-    console.error(`Error in getting custom order bill:`, err);
+    console.error("Error in getting custom order bill:", err);
     return null;
   }
 };
+
+export const addCustomTipPromo = async(cartId , orderType ,tip) => {
+  const token = localStorage.getItem(`authToken`);
+  try {
+    const data = await axios.post(`${BASE_URL}/customers/add-custom-tip-and-promocode`,{
+      addedTip : tip
+    },{
+      headers : {
+        Authorization : `Bearer ${token}`
+      },
+      withCredentials: true
+    });
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -24,7 +24,7 @@ const cartInitialize = async () => {
 
   try {
     const data = await sendItemData(payload);
-    console.log("Cart Data sent", data);
+    console.log("Cart Data sent", cart);
     navigate(`/checkout-page`, { state: { cart ,businessCategoryId} });
   } catch (error) {
     console.error(error);
