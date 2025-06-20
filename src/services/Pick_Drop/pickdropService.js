@@ -43,6 +43,37 @@ export const fetchVehicleCharges = async (token, cartId) => {
   }
 };
 
+export const submitAddress = async (
+  type,
+  fullName,
+  phoneNumber,
+  flat,
+  area,
+  landmark,
+  coordinates,
+  token
+) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/customers/update-address`,
+      { type, fullName, phoneNumber, flat, area, landmark, coordinates },
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+     return response.data?.address;
+  } catch (error) {
+    console.error(
+      "Adding address Failed:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
 export const submitPickDropRequest = async (formData, token) => {
   try {
     const response = await axios.post(
@@ -229,7 +260,6 @@ export const removePromocode = async (cartId, deliveryMode, token) => {
   }
 };
 
-
 export const confirmPickAndDropOrder = async (paymentMode, token) => {
   try {
     const response = await axios.post(
@@ -250,11 +280,14 @@ export const confirmPickAndDropOrder = async (paymentMode, token) => {
         amount: null,
       };
     }
-console.log("hai",response.data.order_id);
+    console.log("hai", response.data.order_id);
 
     return response.data;
   } catch (err) {
-    console.error("❌ Order creation failed:", err.response?.data || err.message);
+    console.error(
+      "❌ Order creation failed:",
+      err.response?.data || err.message
+    );
     return { success: false, orderId: null };
   }
 };
@@ -267,7 +300,8 @@ export const verifyPickAndDropPayment = async (orderId, amount, token) => {
       name: "Famto",
       description: "Order Payment",
       order_id: orderId,
-      image: "https://res.cloudinary.com/dcfj1j1ku/image/upload/v1743054538/Group_427320859_y8jszt.svg",
+      image:
+        "https://res.cloudinary.com/dcfj1j1ku/image/upload/v1743054538/Group_427320859_y8jszt.svg",
       handler: async function (response) {
         try {
           const paymentDetails = {
@@ -286,8 +320,8 @@ export const verifyPickAndDropPayment = async (orderId, amount, token) => {
           );
 
           if (res.status === 200) {
-            resolve(res.data); 
-            console.log("helo",res.data.orderId);// ✅ Only return result, don't navigate
+            resolve(res.data);
+            console.log("helo", res.data.orderId); // ✅ Only return result, don't navigate
           } else {
             reject(new Error("Backend verification failed"));
           }
@@ -304,11 +338,11 @@ export const verifyPickAndDropPayment = async (orderId, amount, token) => {
   });
 };
 
-export const cancelOrder = async (orderId,token) => {
+export const cancelOrder = async (orderId, token) => {
   try {
     const res = await axios.post(
       `${BASE_URL}/customers/cancel-pick-and-drop-order`,
-      {orderId}, 
+      { orderId },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -348,7 +382,6 @@ export const cancelOrder = async (orderId,token) => {
 //     //   ? response.data
 //     //   : { success: false, orderId: "" };
 
-      
 //   } catch (error) {
 //     console.error("❌ API Error:", err.response?.data || err.message);
 //     console.error(
@@ -426,7 +459,6 @@ export const cancelOrder = async (orderId,token) => {
 // };
 // export const verifyPickAndDropPayment = async (orderId, amount, token) => {
 //   try {
-    
 
 //     // if (!razorpayKey) {
 //     //   throw new Error("Razorpay key is missing in .env");

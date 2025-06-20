@@ -26,6 +26,7 @@ const Pick_Drop = () => {
   const [pickupInstructions, setPickupInstructions] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [vehicleCharges, setVehicleCharges] = useState([]);
+
   const categories = [
     {
       id: 0,
@@ -55,9 +56,9 @@ const Pick_Drop = () => {
       alert("You're not logged in.");
       return;
     }
-    const vehicleType =  selectedVehicle.vehicleType;  
-    const deliveryCharges =  selectedVehicle.deliveryCharges;  
-    const surgeCharges =  selectedVehicle.surgeCharges || 0;  
+    const vehicleType = selectedVehicle.vehicleType;
+    const deliveryCharges = selectedVehicle.deliveryCharges;
+    const surgeCharges = selectedVehicle.surgeCharges || 0;
     try {
       const response = await confirmVehicleTypeandCharge(
         vehicleType,
@@ -67,12 +68,7 @@ const Pick_Drop = () => {
       );
       navigate("/checkout", { state: { confirmationData: response } });
       console.log("API success:", response);
-      console.log(
-        vehicleType,
-        deliveryCharges,
-        surgeCharges,
-        token
-      );
+      console.log(vehicleType, deliveryCharges, surgeCharges, token);
     } catch (err) {
       console.error("API call failed", err);
     }
@@ -162,8 +158,11 @@ const Pick_Drop = () => {
                 sx={{ fontSize: 42 }}
                 className="md:mb-0 mb-12 md:mx-0 mx-auto"
               />
-              <button className="bg-[#00ced1] text-white font-semibold px-4 py-2 md:mb-0 mb-12 rounded-full">
-                Kesavadasapuram
+
+              <button className="bg-[#00ced1] text-white font-semibold px-4 py-2 md:mb-0 mb-12 rounded-full w-[300px]">
+                {pickupAddress?.type === "other"
+                  ? pickupAddress?.area?.toUpperCase() || "CUSTOM AREA"
+                  : pickupAddress?.type?.toUpperCase() || "PICK UP"}
               </button>
             </div>
           </div>
@@ -181,8 +180,10 @@ const Pick_Drop = () => {
                 sx={{ fontSize: 42 }}
                 className="md:mb-0 mb-12 md:mx-0 mx-auto"
               />
-              <button className="bg-[#00ced1] text-white font-semibold px-4 py-2 md:mb-0 mb-12 rounded-full">
-                Kesavadasapuram
+               <button className="bg-[#00ced1] text-white font-semibold px-4 py-2 md:mb-0 mb-12 rounded-full w-[300px]">
+                {dropAddress?.type === "other"
+                  ? dropAddress?.area?.toUpperCase() || "CUSTOM AREA"
+                  : dropAddress?.type?.toUpperCase() || "DROP"}
               </button>
             </div>
           </div>
@@ -318,9 +319,8 @@ const Pick_Drop = () => {
             </p>
             <FaArrowRight className="transform transition-transform duration-300 group-hover:translate-x-2" />
           </button>
-        
         </div>
-          {orderId && <Cancel_Cart orderId={orderId} />}
+        {orderId && <Cancel_Cart orderId={orderId} />}
       </main>
     </>
   );

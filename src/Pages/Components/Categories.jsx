@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -43,6 +43,8 @@ export default function CategoryGrid({
   onDeleteCategoryIdClear,
   deletedCategoryId,
   vehicleChargesCallback,
+  isNewPickupAddress,
+  isNewDropAddress,
 }) {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -74,16 +76,83 @@ export default function CategoryGrid({
   }, [editCategoryId]);
 
   useEffect(() => {
-    if (deletedCategoryId !== null) {
-      const updatedData = { ...savedData };
-      delete updatedData[deletedCategoryId];
-      setSavedData(updatedData);
-      if (onSavePackage) {
-        onSavePackage(updatedData);
+    const handleDelete = async () => {
+      if (deletedCategoryId !== null) {
+        const updatedData = { ...savedData };
+        delete updatedData[deletedCategoryId];
+        setSavedData(updatedData);
+
+        // Notify parent
+        if (onSavePackage) {
+          onSavePackage(updatedData);
+        }
+
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          alert("You're not logged in.");
+          return;
+        }
+
+        try {
+          // Convert updated savedData to array
+          const itemsArray = Object.values(updatedData).map((item) => ({
+            itemName: item.name || "Unnamed Item",
+            length: item.length ?? "0",
+            width: item.width ?? "0",
+            height: item.height ?? "0",
+            unit: "cm",
+            weight: item.weight ?? "0",
+          }));
+
+          // ❗ Avoid calling API with empty cart
+          if (itemsArray.length === 0) {
+            alert("No items left in cart. Please add a package.");
+            onDeleteCategoryIdClear();
+            return;
+          }
+
+          console.log("🟡 Items sent to update after delete:", itemsArray);
+
+          // 🔄 Update items in backend
+          const response = await submitUpdateItemRequest(itemsArray, token);
+
+          if (response?.updatedCart?._id) {
+            // Send updated cart ID to parent
+            onCartIdReceived?.(response.updatedCart._id);
+
+            // Re-fetch vehicle charges
+            const charges = await fetchVehicleCharges(
+              token,
+              response.updatedCart._id
+            );
+
+            vehicleChargesCallback?.(charges);
+          }
+
+          alert("Item deleted and charges updated.");
+        } catch (error) {
+          console.error("Error while deleting:", error);
+          alert("Failed to update cart after deleting item.");
+        }
+
+        onDeleteCategoryIdClear();
       }
-      onDeleteCategoryIdClear();
-    }
+    };
+
+    handleDelete();
   }, [deletedCategoryId]);
+
+  // useEffect(() => {
+  //   if (deletedCategoryId !== null) {
+  //     const updatedData = { ...savedData };
+  //     delete updatedData[deletedCategoryId];
+  //     setSavedData(updatedData);
+  //     if (onSavePackage) {
+  //       onSavePackage(updatedData);
+  //     }
+  //     onDeleteCategoryIdClear();
+  //   }
+  // }, [deletedCategoryId]);
 
   const handleOpen = (index) => {
     setSelectedItem(index);
@@ -102,100 +171,6 @@ export default function CategoryGrid({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSave = async () => {
-
-  //   const token = localStorage.getItem("authToken");
-  //   if (!token) return;
-  //   const updatedData = {
-  //     ...savedData,
-  //     [selectedItem]: {
-  //       ...formData,
-  //       image: categories[selectedItem].image,
-  //       name: categories[selectedItem].name,
-  //     },
-  //   };
-  //   setSavedData(updatedData);
-
-  //   const selectedPackage = updatedData[selectedItem];
-
-  //   const formDataToSend = new FormData();
-
-  //   // Pickup address
-  //   formDataToSend.append("pickUpAddressType", pickupAddress.addressType);
-  //   formDataToSend.append("pickUpAddressOtherAddressId","");
-  //   formDataToSend.append("newPickupAddress[fullName]", "");
-  //   formDataToSend.append("newPickupAddress[phoneNumber]", "");
-  //   formDataToSend.append("newPickupAddress[flat]", "");
-  //   formDataToSend.append("newPickupAddress[area]", "");
-  //   formDataToSend.append("newPickupAddress[landmark]", "");
-  //   formDataToSend.append("newPickupAddress[coordinates][0]", "");
-  //   formDataToSend.append("newPickupAddress[coordinates][1]", "");
-  //   formDataToSend.append("addNewPickupToAddressBook", "");
-  //   formDataToSend.append("instructionInPickup",pickupInstructions);
-  //   formDataToSend.append("voiceInstructionInPickup", "");
-
-  //   // Delivery address
-  //   formDataToSend.append("deliveryAddressType",dropAddress.addressType);
-  //   formDataToSend.append("deliveryAddressOtherAddressId", "");
-  //   formDataToSend.append("newDeliveryAddress[fullName]", "");
-  //   formDataToSend.append("newDeliveryAddress[phoneNumber]", "");
-  //   formDataToSend.append("newDeliveryAddress[flat]", "");
-  //   formDataToSend.append("newDeliveryAddress[area]", "");
-  //   formDataToSend.append("newDeliveryAddress[landmark]", "");
-  //   formDataToSend.append("newDeliveryAddress[coordinates][0]", "");
-  //   formDataToSend.append("newDeliveryAddress[coordinates][1]", "");
-  //   formDataToSend.append("addNewDeliveryToAddressBook", "");
-  //   formDataToSend.append("instructionInDelivery", deliveryInstructions);
-  //   formDataToSend.append("voiceInstructionInDelivery", "");
-
-  //   // Schedule
-  //   formDataToSend.append("startDate", "");
-  //   formDataToSend.append("endDate", "");
-  //   formDataToSend.append("time", "");
-
-  //   // Package item
-  //   const item = {
-  //     itemName: selectedPackage.name,
-  //     length: selectedPackage.length,
-  //     width: selectedPackage.width,
-  //     height: selectedPackage.height,
-  //     weight: selectedPackage.weight,
-  //   };
-
-  //   formDataToSend.append("item", JSON.stringify(item));
-
-  //   // 🔗 Make API call
-  //   try {
-  //     const response = await submitPickDropRequest(formDataToSend, token);
-  //     console.log("Pick & Drop Submitted:", response);
-  //       // 👈 adjust this based on actual API response shape
-  //  if (response?.cartId) {
-  //   onCartIdReceived(response.cartId);
-  //   console.log(response.cartId);
-  //   // make sure you passed this as a prop
-  // }
-  //     console.log("🟡 Submitting the following FormData:");
-  //    for (let [key, value] of formDataToSend.entries()) {
-  //   console.log(`${key}:`, value);
-  // }
-
-  //     alert("Pick & Drop Request Submitted Successfully");
-  //   } catch (error) {
-  //     console.error("Error submitting:", error);
-  //         console.log("🟡 Submitting the following FormData:");
-  // for (let [key, value] of formDataToSend.entries()) {
-  //   console.log(`${key}:`, value);
-  //   console.log(pickupAddress);
-  //   console.log(dropAddress);
-
-  // }
-  //     alert("Submission Failed");
-  //   }
-  //    if (onSavePackage) {
-  //         onSavePackage(updatedData);
-  //     }
-  //   setOpen(false);
-  // };
   const handleSave = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
@@ -218,22 +193,41 @@ export default function CategoryGrid({
       if (!hasSubmittedOnce) {
         // 🟢 First item being saved: use pick & drop request
         const formDataToSend = new FormData();
-        formDataToSend.append(
-          "pickUpAddressType",
-          pickupAddress.addressType || ""
-        );
-        if (pickupAddress.addressType === "other") {
+        formDataToSend.append("pickUpAddressType", pickupAddress.type || "");
+        if (pickupAddress.type === "other") {
           formDataToSend.append(
             "pickUpAddressOtherAddressId",
             pickupAddress.id || ""
           );
         }
+        // Only include newPickupAddress fields if it's a new address (no id)
+        if (pickupAddress?.isNewAddress) {
+          formDataToSend.append(
+            "newPickupAddress[fullName]",
+            pickupAddress.fullName
+          );
+          formDataToSend.append(
+            "newPickupAddress[phoneNumber]",
+            pickupAddress.phoneNumber
+          );
+          formDataToSend.append("newPickupAddress[flat]", pickupAddress.flat);
+          formDataToSend.append("newPickupAddress[area]", pickupAddress.area);
+          formDataToSend.append(
+            "newPickupAddress[landmark]",
+            pickupAddress.landmark
+          );
+          formDataToSend.append(
+            "newPickupAddress[coordinates][0]",
+            pickupAddress.coordinates?.[0] || ""
+          );
+          formDataToSend.append(
+            "newPickupAddress[coordinates][1]",
+            pickupAddress.coordinates?.[1] || ""
+          );
+        }
         formDataToSend.append("instructionInPickup", pickupInstructions || "");
-        formDataToSend.append(
-          "deliveryAddressType",
-          dropAddress.addressType || ""
-        );
-        if (dropAddress.addressType === "other") {
+        formDataToSend.append("deliveryAddressType", dropAddress.type || "");
+        if (dropAddress.type === "other") {
           formDataToSend.append(
             "deliveryAddressOtherAddressId",
             dropAddress.id || ""
@@ -243,7 +237,30 @@ export default function CategoryGrid({
           "instructionInDelivery",
           deliveryInstructions || ""
         );
-
+        if (dropAddress?.isNewAddress) {
+          formDataToSend.append(
+            "newDeliveryAddress[fullName]",
+            dropAddress.fullName
+          );
+          formDataToSend.append(
+            "newDeliveryAddress[phoneNumber]",
+            dropAddress.phoneNumber
+          );
+          formDataToSend.append("newDeliveryAddress[flat]", dropAddress.flat);
+          formDataToSend.append("newDeliveryAddress[area]", dropAddress.area);
+          formDataToSend.append(
+            "newDeliveryAddress[landmark]",
+            dropAddress.landmark
+          );
+          formDataToSend.append(
+            "newDeliveryAddress[coordinates][0]",
+            dropAddress.coordinates?.[0] || ""
+          );
+          formDataToSend.append(
+            "newDeliveryAddress[coordinates][1]",
+            dropAddress.coordinates?.[1] || ""
+          );
+        }
         const item = {
           itemName: selectedPackage.name,
           length: selectedPackage.length,
@@ -265,6 +282,20 @@ export default function CategoryGrid({
 
         setHasSubmittedOnce(true);
         console.log("pickdrop", response.cartId);
+        console.log("pickdrop", pickupAddress.fullName);
+        console.log("pickdrop", pickupAddress.phoneNumber);
+        console.log("pickdrop", pickupAddress.flat);
+        console.log("pickdrop", pickupAddress.area);
+        console.log("id", pickupAddress.id);
+        console.log("pickdrop", pickupAddress);
+        console.log("pickdrop", pickupAddress.landmark);
+        console.log("pickdrop", pickupAddress.coordinates[0]);
+        console.log("pickdrop", pickupAddress.coordinates[1]);
+        //  console.log("Pick & Drop Submitted:", formDataToSend);
+        console.log("🟡 Submitting the following FormData:");
+        for (let [key, value] of formDataToSend.entries()) {
+          console.log(`${key}:`, value);
+        }
         alert("Pick & Drop Request Submitted");
       } else {
         // 🟡 Subsequent save/edit
@@ -349,7 +380,7 @@ export default function CategoryGrid({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center"
+              className="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center"
             >
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -429,3 +460,98 @@ export default function CategoryGrid({
     </div>
   );
 }
+
+// const handleSave = async () => {
+
+//   const token = localStorage.getItem("authToken");
+//   if (!token) return;
+//   const updatedData = {
+//     ...savedData,
+//     [selectedItem]: {
+//       ...formData,
+//       image: categories[selectedItem].image,
+//       name: categories[selectedItem].name,
+//     },
+//   };
+//   setSavedData(updatedData);
+
+//   const selectedPackage = updatedData[selectedItem];
+
+//   const formDataToSend = new FormData();
+
+//   // Pickup address
+//   formDataToSend.append("pickUpAddressType", pickupAddress.addressType);
+//   formDataToSend.append("pickUpAddressOtherAddressId","");
+// formDataToSend.append("newPickupAddress[fullName]", "");
+// formDataToSend.append("newPickupAddress[phoneNumber]", "");
+// formDataToSend.append("newPickupAddress[flat]", "");
+// formDataToSend.append("newPickupAddress[area]", "");
+// formDataToSend.append("newPickupAddress[landmark]", "");
+// formDataToSend.append("newPickupAddress[coordinates][0]", "");
+// formDataToSend.append("newPickupAddress[coordinates][1]", "");
+//   formDataToSend.append("addNewPickupToAddressBook", "");
+//   formDataToSend.append("instructionInPickup",pickupInstructions);
+//   formDataToSend.append("voiceInstructionInPickup", "");
+
+//   // Delivery address
+//   formDataToSend.append("deliveryAddressType",dropAddress.addressType);
+//   formDataToSend.append("deliveryAddressOtherAddressId", "");
+//   formDataToSend.append("newDeliveryAddress[fullName]", "");
+//   formDataToSend.append("newDeliveryAddress[phoneNumber]", "");
+//   formDataToSend.append("newDeliveryAddress[flat]", "");
+//   formDataToSend.append("newDeliveryAddress[area]", "");
+//   formDataToSend.append("newDeliveryAddress[landmark]", "");
+//   formDataToSend.append("newDeliveryAddress[coordinates][0]", "");
+//   formDataToSend.append("newDeliveryAddress[coordinates][1]", "");
+//   formDataToSend.append("addNewDeliveryToAddressBook", "");
+//   formDataToSend.append("instructionInDelivery", deliveryInstructions);
+//   formDataToSend.append("voiceInstructionInDelivery", "");
+
+//   // Schedule
+//   formDataToSend.append("startDate", "");
+//   formDataToSend.append("endDate", "");
+//   formDataToSend.append("time", "");
+
+//   // Package item
+//   const item = {
+//     itemName: selectedPackage.name,
+//     length: selectedPackage.length,
+//     width: selectedPackage.width,
+//     height: selectedPackage.height,
+//     weight: selectedPackage.weight,
+//   };
+
+//   formDataToSend.append("item", JSON.stringify(item));
+
+//   // 🔗 Make API call
+//   try {
+//     const response = await submitPickDropRequest(formDataToSend, token);
+//     console.log("Pick & Drop Submitted:", response);
+//       // 👈 adjust this based on actual API response shape
+//  if (response?.cartId) {
+//   onCartIdReceived(response.cartId);
+//   console.log(response.cartId);
+//   // make sure you passed this as a prop
+// }
+//     console.log("🟡 Submitting the following FormData:");
+//    for (let [key, value] of formDataToSend.entries()) {
+//   console.log(`${key}:`, value);
+// }
+
+//     alert("Pick & Drop Request Submitted Successfully");
+//   } catch (error) {
+//     console.error("Error submitting:", error);
+//         console.log("🟡 Submitting the following FormData:");
+// for (let [key, value] of formDataToSend.entries()) {
+//   console.log(`${key}:`, value);
+//   console.log(pickupAddress);
+//   console.log(dropAddress);
+
+// }
+//     alert("Submission Failed");
+//   }
+//    if (onSavePackage) {
+//         onSavePackage(updatedData);
+//     }
+//   setOpen(false);
+// };
