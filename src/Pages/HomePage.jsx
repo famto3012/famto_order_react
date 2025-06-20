@@ -36,7 +36,7 @@ const HomePage = () => {
   };
 
   return (
-    <main className="bg-gradient-to-b from-[#00CED1] via-white to-white min-h-screen md:p-12 p-4 w-100%">
+    <main className="bg-gradient-to-b w-fit-content from-[#00CED1] via-white to-white min-h-screen md:p-12 p-4 w-100%">
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ const HomePage = () => {
         ].map((service, index) => (
           <div
             key={index}
-            className="relative h-100 bg-white hover:bg-teal-300 p-6 shadow-md rounded-2xl flex flex-col items-center hover:shadow-xl transition cursor-pointer overflow-visible"
+            className="relative h-100 w-fit-screen bg-white hover:bg-teal-300 p-6 mx-2 shadow-md rounded-2xl flex flex-col items-center hover:shadow-xl transition cursor-pointer overflow-visible"
             onClick={() => navigate(service.route)}
           >
             {/* Curved Effect */}
@@ -121,7 +121,7 @@ const HomePage = () => {
             {service.isLottie ? (
               <Lottie
                 animationData={service.icon} // Now passing valid animation data
-                className="w-80 h-80 bottom-32 relative z-10"
+                className="w-10% h-80 bottom-32 relative z-10"
               />
             ) : (
               <img
