@@ -1,14 +1,28 @@
 import axios from "axios";
 import BASE_URL from "../../BaseURL";
+import securedAxios from "../../utils/SecuredAxios";
 
-export const fetchCustomerAddress = async (token) => {
+// export const fetchCustomerAddress = async (token) => {
+//   try {
+//     const response = await securedAxios.get(`${BASE_URL}/customers/customer-address`, {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return response.data || [];
+//   } catch (error) {
+//     console.error(
+//       "Address fetch failed:",
+//       error.response?.data || error.message
+//     );
+//     return [];
+//   }
+// };
+
+export const fetchCustomerAddress = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/customers/customer-address`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await securedAxios.get("/customers/customer-address");
     return response.data || [];
   } catch (error) {
     console.error(
@@ -19,17 +33,14 @@ export const fetchCustomerAddress = async (token) => {
   }
 };
 
-export const fetchVehicleCharges = async (token, cartId) => {
+
+export const fetchVehicleCharges = async (cartId) => {
   try {
-    const response = await axios.get(
+    const response = await securedAxios.get(
       `${BASE_URL}/customers/get-vehicle-charges`,
       {
         params: {
           cartId,
-        },
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -82,7 +93,6 @@ export const submitPickDropRequest = async (formData, token) => {
       {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data", // important for FormData
         },
       }

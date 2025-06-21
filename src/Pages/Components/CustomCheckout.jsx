@@ -163,10 +163,7 @@ const CustomCheckout = ({}) => {
       setSelectedTip(tip);
       setIsOtherTip(false);
       console.log("Tip selected:", tip);
-
-      // Example backend call — you should replace or define `applyTip` and `fetchCharges`
-      await addCustomTipPromo(cartId, "custom-order", tip, token);
-      // await fetchCharges();
+      await applyTip(cartId, "custom-order", tip, token);
     } catch (err) {
       console.error("❌ Failed to save tip:", err);
     }
