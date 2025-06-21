@@ -338,7 +338,7 @@ export default function CategoryGrid({
   };
 
   return (
-    <div className="max-w-6xl mx-auto md:grid grid-cols-4 gap-6">
+    <div className="max-w-7xl mx-auto grid-cols-1 sm:grid sm:grid-cols-2 md:grid md:grid-cols-3 lg:grid lg:grid-cols-4  space-y-7">
       {categories.map((category, index) => (
         <motion.div
           key={index}
@@ -348,11 +348,10 @@ export default function CategoryGrid({
         >
           <Card
             sx={{
-              width: "250px",
               borderRadius: "30px",
               boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
             }}
-            className="text-center shadow-2xl cursor-pointer"
+            className="text-center shadow-2xl cursor-pointer mx-auto w-[300px] md:w-[250px]"
             onClick={() => handleOpen(index)}
           >
             <CardContent>
