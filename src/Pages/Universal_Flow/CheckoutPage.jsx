@@ -230,15 +230,16 @@ const CheckoutPage = () => {
             Take Away
           </button>
         </div>
-
+{orderType === "Home Delivery" ? (
         <Address
           onSelectAddress={(selectedAddress) =>
             setSelectedAddress(selectedAddress)
           }
         />
+) : null }
 
         {/* Instruction to Rider */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center px-3 py-6 gap-2">
           <input
             type="text"
             placeholder="Instructions (if any)"
@@ -249,7 +250,7 @@ const CheckoutPage = () => {
         </div>
 
         {/* Cart Items */}
-        <div>
+        <div className="p-3">
           <h3 className="text-lg font-semibold mb-3">Added Items</h3>
           {cartItems.length === 0 ? (
             <p className="text-gray-500">No items in cart</p>
@@ -286,7 +287,7 @@ const CheckoutPage = () => {
         </div>
 
         {/* Instruction to Merchant */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center py-5 px-3 gap-2">
           <input
             type="text"
             placeholder="Instruction to merchant"
@@ -297,12 +298,14 @@ const CheckoutPage = () => {
         </div>
 
         {/* Confirm Button */}
+        <div className="p-3">
         <button
           onClick={handleConfirmOrder}
           className="w-full bg-teal-500 text-white py-4 rounded-full font-semibold text-lg"
         >
           Confirm Order detail
         </button>
+        </div>
       </motion.section>
     </div>
   );
