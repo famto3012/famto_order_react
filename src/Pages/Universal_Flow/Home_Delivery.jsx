@@ -31,8 +31,7 @@ const Home_Delivery =() => {
   };
 
   return (
-    <main className="w-full min
-    -h-screen flex flex-col items-center justify-start p-4">
+    <main className="w-full min-h-screen flex flex-col items-center justify-start p-4">
       <motion.section
         className="home-banner"
         initial={{ opacity: 0, x: -100 }}

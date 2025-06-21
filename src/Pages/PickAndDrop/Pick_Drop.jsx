@@ -88,55 +88,57 @@ const Pick_Drop = () => {
   };
 
   return (
-    <>
-      <main>
-        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <main className="max-w-6xl mx-auto  overflow-hidden">
+     
+       <div className="rounded-lg shadow-lg ">
           <div
             className="relative p-10 rounded-lg bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url('/order/delivery_motorvehicle.jpg')`,
             }}
           >
-            <div className="absolute inset-0 bg-white opacity-80 rounded-lg z-0"></div>
-            <div className="relative flex items-center justify-between z-10">
-              <div className="flex flex-col gap-6 mt-6 w-1/2">
-                <p className="text-[15px] md:text-[36px] font-[600] z-10">
+            <div className="absolute inset-0 bg-white opacity-80 rounded-lg z-0">
+                <p className="text-[18px] font-semibold  md:text-5xl md:font-bold z-10 text-black p-8 lg:text-start text-center ">
                   From Your Door to Their Door
                 </p>
+            </div>
+            
+            <div className="relative flex flex-col md:flex-row items-center md:justify-between my-9  z-10 ">
+              <div className="flex flex-col gap-6 mt-6 w-1/2 rounded-tl-full">
 
                 {/* Card 1 */}
-                <div className="bg-[#00ced1] flex flex-col px-8 py-4 shadow-lg rounded-[50px]  self-start">
-                  <p className="text-[18px] font-[500] text-white">
+                <div className="bg-[#00ced1] flex flex-col p-4 md:w-80 w-72 shadow-lg rounded-lg self-center md:self-start">
+                  <p className="text-sm md:text-[18px] font-[500] text-white">
                     Forgot something at home?
                   </p>
-                  <p className="text-[14px] text-white">
+                  <p className="text-xs md:text-[14px] text-white">
                     Give us a pickup address
                   </p>
                 </div>
 
                 {/* Card 2 */}
-                <div className="bg-[#00ced1] flex flex-col px-8 py-4 shadow-lg rounded-[50px]  self-end">
-                  <p className="text-[18px] font-[500] text-white">
+                <div className="bg-[#00ced1] flex flex-col p-4 md:w-90 w-72 shadow-lg rounded-lg self-center md:self-end">
+                  <p className="text-sm md:text-[18px] font-[500] text-white">
                     Delivery boys available anytime
                   </p>
-                  <p className="text-[14px] text-white">
+                  <p className="text-xs md:text-[14px] text-white">
                     Our delivery agents are at your service
                   </p>
                 </div>
 
                 {/* Card 3 */}
-                <div className="bg-[#00ced1] flex flex-col px-8 py-4 shadow-lg rounded-[50px]  self-center">
-                  <p className="text-[18px] font-[500] text-white">
+                <div className="bg-[#00ced1] flex flex-col p-4 md:w-80 w-72 shadow-lg rounded-lg self-center smd:elf-start">
+                  <p className="text-sm md:text-[18px] font-[500] text-white">
                     Fast and safe delivery
                   </p>
-                  <p className="text-[14px] text-white">
+                  <p className="text-xs md:text-[14px] text-white">
                     We ensure safe & fast delivery every time
                   </p>
                 </div>
               </div>
 
               {/* Image Section */}
-              <div className="relative w-80 h-80 shadow-lg bg-[#0D0D1F] rounded-lg overflow-hidden">
+              <div className="relative w-80 h-80 shadow-lg bg-[#0D0D1F] rounded-lg overflow-hidden my-9">
                 <img
                   src="/order/delivery boys.png"
                   alt="Delivery Boys"
@@ -321,8 +323,8 @@ const Pick_Drop = () => {
           </button>
         </div>
         {orderId && <Cancel_Cart orderId={orderId} />}
-      </main>
-    </>
+   
+    </main>
   );
 };
 
