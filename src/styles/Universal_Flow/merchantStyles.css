@@ -1,8 +1,16 @@
 /* src/components/MerchantLists/MerchantLists.module.css */
 
 .container {
+  width: 100%;
   padding: 1rem;
   background-color: white;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 4rem;
+    width: 100%;
+  }
 }
 
 .title {
@@ -14,9 +22,16 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  padding: 3rem;
+  /* padding: 1rem; */
+}
+
+
+@media (min-width: 768px) {
+  .grid {
+   grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  }
 }
 
 .card {
@@ -50,6 +65,8 @@
   font-weight: 600;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .cardRating {

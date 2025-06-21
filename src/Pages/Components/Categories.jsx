@@ -295,7 +295,7 @@ export default function CategoryGrid({
         for (let [key, value] of formDataToSend.entries()) {
           console.log(`${key}:`, value);
         }
-        alert("Pick & Drop Request Submitted");
+        // alert("Pick & Drop Request Submitted");
       } else {
         // 🟡 Subsequent save/edit
         const itemsArray = Object.values(updatedData).map((item) => ({

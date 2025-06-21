@@ -1,4 +1,4 @@
-.custom-order-container {
+/* .custom-order-container {
   display: flex;
   padding: 4rem;
   gap: 40px;
@@ -163,4 +163,308 @@ margin-top: 20px;
 .bill-data {
   text-size-adjust: 10px;
   /* width: 50%; */
+/* } */ 
+
+/* } */
+
+
+.custom-order-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 4rem;
+  gap: 40px;
+  background: #f8f8f8;
+  min-height: 100vh;
+}
+
+.order-section {
+  flex: 1;
+  background: white;
+  padding: 4rem;
+  border-radius: 10px;
+  min-width: 320px;
+}
+
+.primary-btn {
+  display: block;
+  width: 70%;
+  margin: 10px 0;
+  padding: 12px;
+  background: #00cfd0;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-group {
+  margin: 15px 0;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  background: #eceaea;
+  border: none;
+  border-radius: 10px;
+}
+
+.quantity-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quantity-group .unit {
+  background: #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ccc;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.secondary-btn {
+  flex: 1;
+  padding: 10px;
+  background: #00ced1;
+  border: none;
+  border-radius: 3rem;
+  font-weight: bold;
+  color: #f0f0f0;
+  cursor: pointer;
+}
+
+.delivery-heading {
+  color: teal;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.address-options {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.address-options button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.instruction-box {
+  width: 100%;
+  padding: 10px;
+  background: #ddd;
+  border: none;
+  margin-top: 20px;
+  border-radius: 5px;
+}
+
+.checkout-box {
+  width: 100%;
+  padding: 20px;
+  background: #f7f7f7;
+  border-radius: 10px;
+  margin: auto;
+  margin-top: 2rem;
+}
+
+.checkout-img {
+  width: 100%;
+  height: 5rem;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.checkout-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.checkout-item p {
+  text-align: center;
+  font-weight: bold;
+}
+
+.tag-options {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.tag-options button {
+  background: #00cfd0;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.bill-summary {
+  margin-top: 15px;
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.bill-row.total {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.bill-data {
+  text-size-adjust: 10px;
+}
+
+/* ----------------- Responsive Design ----------------- */
+@media (max-width: 1024px) {
+  .custom-order-container {
+    flex-direction: column;
+    padding: 2rem;
+  }
+
+  .order-section {
+    padding: 2rem;
+  }
+
+  .primary-btn {
+    width: 100%;
+  }
+
+  .checkout-box {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .secondary-btn {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-order-container {
+    padding: 0rem;
+    gap: 20px;
+  }
+
+  .order-section {
+    padding: 1.5rem;
+  }
+
+  .form-group input,
+  .instruction-box {
+    font-size: 14px;
+  }
+
+  .checkout-img {
+    height: 4rem;
+  }
+
+  .checkout-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Checkout Component Specific Enhancements */
+.checkout-box {
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Make tip button group responsive */
+.tip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Promo card container responsive */
+.promo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Responsive promo code card */
+.promo-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Responsive apply promo and badge wrapper */
+.promo-apply-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .checkout-box {
+    padding: 1rem;
+  }
+
+  .promo-card {
+    max-width: 100%;
+  }
+
+  .tip-group button {
+    flex: 1 1 45%;
+  }
+
+  .promo-apply-wrapper {
+    flex-direction: column;
+  }
+
+  .bill-row {
+    font-size: 14px;
+  }
 }

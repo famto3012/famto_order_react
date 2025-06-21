@@ -3,18 +3,11 @@ import BASE_URL from "../../BaseURL";
 import securedAxios from "../../utils/SecuredAxios";
 
 export const addShop = async (payload) => {
-  const token = localStorage.getItem("authToken");
 
   try {
     const resposne = await securedAxios.post(
       `${BASE_URL}/customers/add-shop`,
       payload,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
     );
     if (resposne.status === 200) {
       return resposne.data && resposne.status;

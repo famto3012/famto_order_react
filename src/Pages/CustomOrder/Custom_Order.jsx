@@ -303,12 +303,12 @@ const handleSave = async () => {
           <div className="form-group quantity-group">
             <label>Quantity</label>
             <input
-              type="text"
+              type="number"
               value={numOfUnits}
               onChange={(e) => setQuantityValue(e.target.value)}
               placeholder="Enter Quantity"
             />
-            <span className="unit">{unit}</span>
+            {/* <span className="unit">{unit}</span> */}
           </div>
 
           <div className="form-group">
