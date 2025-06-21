@@ -126,17 +126,16 @@ export const updateItemData = async (productId, newQuantity, variantTypeId) => {
   }
 };
 
-export const updateCartDetail = async (formData) => {
-  console.log("Pay load", formData);
+export const updateCartDetail = async (data) => {
+  console.log("Pay load", data);
   try {
-    const response = await securedAxios.post(`${BASE_URL}/customers/cart/add-details`,
-      {
-    formData,
-      },
-    );
+    const response = await securedAxios.post(`${BASE_URL}/customers/cart/add-details`, data);
     console.log(response.data);
     return response.data;
-  } catch (error) {}
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
 };
 
 export const fetchMapplsAuthToken = async (navigate) => {
@@ -259,17 +258,33 @@ export const fetchTemporaryOrders = async () => {
   return [];
 };
 
-export const cancelOrderById = async (orderId) => {
+export const cancelOrderById = async (orderId, deliveryMode) => {
   try {
-    const response = await securedAxios.post(
-      `${BASE_URL}/customers/cancel-universal-order`,
-      {
-        orderId: orderId,
-      },
-    );
-    console.log(response.data);
+    let endpoint = "";
+
+    switch (deliveryMode) {
+      case "Pick and Drop":
+        endpoint = "/customers/cancel-pick-and-drop-order";
+        break;
+      case "Home Delivery":
+        endpoint = "/customers/cancel-universal-order";
+        break;
+      case "Custom Order":
+        endpoint = "/customers/cancel-custom-order";
+        break;
+      default:
+        throw new Error("Invalid delivery mode");
+    }
+
+    const response = await securedAxios.post(`${BASE_URL}${endpoint}`, {
+      orderId,
+    });
+
+    console.log("Cancel response:", response.data);
+    return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Cancel order error:", error);
+    throw error;
   }
 };
 

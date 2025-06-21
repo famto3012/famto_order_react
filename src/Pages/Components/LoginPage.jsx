@@ -35,7 +35,8 @@ const LoginPage = () => {
      navigate(-1);
   
       // Handle success - save token or redirect
-      alert("Login successful!",data.success);
+      alert("Login successful!",data.token);
+      console.log('Logged in',data.token);
      
     } catch (err) {
       setError(err.response?.data?.message || "Failed to login. Please try again.");

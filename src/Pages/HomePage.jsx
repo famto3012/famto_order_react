@@ -202,7 +202,7 @@ useEffect(() => {
           <img
             src="/order/app.png"
             alt="Famto App Preview"
-            className="w-40 md:w-1/2 h-full"
+            className="w-40 md:80 h-full"
           />
         </div>
         <div className="mb-4 md:mb-0">

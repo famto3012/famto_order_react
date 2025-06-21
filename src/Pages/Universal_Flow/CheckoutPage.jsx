@@ -16,94 +16,156 @@ const CheckoutPage = () => {
 
   const cartItems = Object.entries(cart);
   const [selectedAddress, setSelectedAddress] = useState(null);
+
   const handleConfirmOrder = async () => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      alert("You're not logged in.");
+  console.log("Selected Address", selectedAddress);
+  
+  // Debug your data first
+  console.log("Debug values:", {
+    selectedAddress,
+    businessCategoryId,
+    orderType,
+    merchantInstruction,
+    cartItems
+  });
+
+  try {
+    const formDataToSend = new FormData();
+    
+    // Required fields based on backend
+    formDataToSend.append("businessCategoryId", businessCategoryId || "");
+    formDataToSend.append("deliveryAddressType", selectedAddress?.type || "");
+    
+    // Delivery mode - backend expects this field
+    formDataToSend.append("deliveryMode", "Home Delivery");
+    
+    // Handle existing address (when type is "other" and has ID)
+    if (selectedAddress?.type === "other" && selectedAddress?.id) {
+      formDataToSend.append("deliveryAddressOtherAddressId", selectedAddress.id);
+    }
+    
+    // Handle new address - when id is undefined or isNewAddress is true
+    if (!selectedAddress?.id || selectedAddress?.isNewAddress) {
+      formDataToSend.append("newDeliveryAddress[fullName]", selectedAddress?.fullName || "");
+      formDataToSend.append("newDeliveryAddress[phoneNumber]", selectedAddress?.phoneNumber || "");
+      formDataToSend.append("newDeliveryAddress[flat]", selectedAddress?.flat || "");
+      formDataToSend.append("newDeliveryAddress[area]", selectedAddress?.area || "");
+      formDataToSend.append("newDeliveryAddress[landmark]", selectedAddress?.landmark || "");
+      formDataToSend.append("newDeliveryAddress[coordinates][0]", selectedAddress?.coordinates?.[0] || "");
+      formDataToSend.append("newDeliveryAddress[coordinates][1]", selectedAddress?.coordinates?.[1] || "");
+    }
+    
+    // Instructions - backend expects these specific field names
+    formDataToSend.append("instructionToMerchant", merchantInstruction || "");
+    formDataToSend.append("instructionToDeliveryAgent", "");
+    
+    // Super market order flag
+    formDataToSend.append("isSuperMarketOrder", "false");
+
+    // Cart items validation
+    console.log("cartItems structure:", cartItems);
+    
+    if (!cartItems || (Array.isArray(cartItems) && cartItems.length === 0) || 
+        (typeof cartItems === 'object' && Object.keys(cartItems).length === 0)) {
+      alert("Your cart is empty. Please add items before confirming order.");
       return;
     }
 
-    // const updatedData = {
-    //   ...savedData,
-    //   [selectedItem]: {
-    //     ...formData,
-    //     image: categories[selectedItem].image,
-    //     name: categories[selectedItem].name,
-    //   },
-    // };
-
-
-    try {
-     
-        // 🟢 First item being saved: use pick & drop request
-        const formDataToSend = new FormData();
-        formDataToSend.append(
-          "deliveryAddressType",
-          selectedAddress.type || ""
-        );
-        formDataToSend.append("businessCategoryId", businessCategoryId || "");
-        formDataToSend.append("orderType", orderType || "");
-        if (selectedAddress.type === "other") {
-          formDataToSend.append(
-            "deliveryAddressOtherAddressId",
-            selectedAddress.id || ""
-          );
-        }
-        // Only include newPickupAddress fields if it's a new address (no id)
-        if (selectedAddress?.isNewAddress) {
-          formDataToSend.append(
-            "newDeliveryAddress[fullName]",
-            selectedAddress.fullName
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[phoneNumber]",
-            selectedAddress.phoneNumber
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[flat]",
-            selectedAddress.flat
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[area]",
-            selectedAddress.area
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[landmark]",
-            selectedAddress.landmark
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[coordinates][0]",
-            selectedAddress.coordinates?.[0] || ""
-          );
-          formDataToSend.append(
-            "newDeliveryAddress[coordinates][1]",
-            selectedAddress.coordinates?.[1] || ""
-          );
-        }
-        formDataToSend.append("instructionInPickup", selectedAddress || "");
-
-        const items = cartItems.map(([productId, item]) => ({
-          productId,
-          quantity: item.quantity,
-          variantTypeId: item.variantTypeId || null,
-        }));
-        formDataToSend.append("item", JSON.stringify(items));
-
-        const response = await updateCartDetail(formDataToSend, token);
-        console.log(response);
-         navigate("/order-confirm", {
-        state: { confirmationData: response, orderType },
-        });
-        for (let [key, value] of formDataToSend.entries()) {
-          console.log(`${key}:`, value);
-        }
-        alert("Pick & Drop Request Submitted");
-     
-    } catch (error) {
-      console.error("Submit failed:", error);
-      alert("Failed to save item.");
+    // Debug FormData contents
+    console.log("=== FormData Contents ===");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(`${key}:`, value);
     }
-  };
+
+    const response = await updateCartDetail(formDataToSend);
+    console.log("Response:", response);
+    
+    navigate("/order-confirm", {
+      state: { confirmationData: response, orderType },
+    });
+    
+  } catch (error) {
+    console.error("Submit failed:", error);
+    alert("Failed to save item.");
+  }
+};
+
+  // const handleConfirmOrder = async () => {
+  //   console.log("Selected Address", selectedAddress);
+  //   // const updatedData = {
+  //   //   ...savedData,
+  //   //   [selectedItem]: {
+  //   //     ...formData,
+  //   //     image: categories[selectedItem].image,
+  //   //     name: categories[selectedItem].name,
+  //   //   },
+  //   // };
+
+  //   try {
+  //     // 🟢 First item being saved: use pick & drop request
+  //     const formDataToSend = new FormData();
+  //     if (selectedAddress?.type) {
+  //       formDataToSend.append("deliveryAddressType", selectedAddress.type);
+  //     } else {
+  //       console.warn("Missing address type");
+  //     }
+  //     formDataToSend.append("businessCategoryId", businessCategoryId || "");
+  //     formDataToSend.append("orderType", orderType || "");
+  //     if (selectedAddress.type === "other") {
+  //       formDataToSend.append(
+  //         "deliveryAddressOtherAddressId",
+  //         selectedAddress.id || ""
+  //       );
+  //     }
+  //     // Only include newPickupAddress fields if it's a new address (no id)
+  //     if (selectedAddress?.isNewAddress) {
+  //       formDataToSend.append(
+  //         "newDeliveryAddress[fullName]",
+  //         selectedAddress.fullName
+  //       );
+  //       formDataToSend.append(
+  //         "newDeliveryAddress[phoneNumber]",
+  //         selectedAddress.phoneNumber
+  //       );
+  //       formDataToSend.append("newDeliveryAddress[flat]", selectedAddress.flat);
+  //       formDataToSend.append("newDeliveryAddress[area]", selectedAddress.area);
+  //       formDataToSend.append(
+  //         "newDeliveryAddress[landmark]",
+  //         selectedAddress.landmark
+  //       );
+  //       formDataToSend.append(
+  //         "newDeliveryAddress[coordinates][0]",
+  //         selectedAddress.coordinates?.[0] || ""
+  //       );
+  //       formDataToSend.append(
+  //         "newDeliveryAddress[coordinates][1]",
+  //         selectedAddress.coordinates?.[1] || ""
+  //       );
+  //     }
+  //     formDataToSend.append("instructionInPickup", merchantInstruction || "");
+
+  //     const items = cartItems.map(([productId, item]) => ({
+  //       productId,
+  //       quantity: item.quantity,
+  //       variantTypeId: item.variantTypeId || null,
+  //     }));
+  //     formDataToSend.append("item", JSON.stringify(items));
+  //       for (let [key, value] of formDataToSend.entries()) {
+  //       console.log(`${key}:`, value);
+  //     }
+  //     console.log("Formn Data to send", formDataToSend);
+  //     const response = await updateCartDetail(formDataToSend);
+  //     console.log(response);
+  //     navigate("/order-confirm", {
+  //       state: { confirmationData: response, orderType },
+  //     });
+    
+  //   } catch (error) {
+  //     console.error("Submit failed:", error);
+  //     alert("Failed to save item.");
+  //   }
+  // };
+
   // const handleConfirmOrder = async () => {
   //   const items = cartItems.map(([productId, item]) => ({
   //     productId,

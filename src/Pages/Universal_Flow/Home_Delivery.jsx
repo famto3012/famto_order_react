@@ -49,7 +49,7 @@ const Home_Delivery =() => {
           <h2 className="text-4xl md:text-5xl font-bold text-teal-300">
             Fast and Fresh
           </h2>
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <p className="text-sm text-gray-300 mb-2">
               Search for what you need !!!
             </p>
@@ -63,7 +63,7 @@ const Home_Delivery =() => {
                 Search
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
         <img
           src="/order/home.png"

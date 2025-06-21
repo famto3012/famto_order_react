@@ -87,11 +87,10 @@ export const submitAddress = async (
 
 export const submitPickDropRequest = async (formData, token) => {
   try {
-    const response = await axios.post(
+    const response = await securedAxios.post(
       `${BASE_URL}/customers/add-pick-and-drop-address`,
       formData,
       {
-        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data", // important for FormData
         },
@@ -134,18 +133,11 @@ export const confirmVehicleTypeandCharge = async (
   vehicleType,
   deliveryCharges,
   surgeCharges,
-  token
 ) => {
   try {
-    const response = await axios.post(
+    const response = await securedAxios.post(
       `${BASE_URL}/customers/add-pick-and-drop-items`,
       { vehicleType, deliveryCharges, surgeCharges },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
     );
     return response.data;
   } catch (error) {
@@ -248,17 +240,11 @@ export const applyPromocode = async (
   }
 };
 
-export const removePromocode = async (cartId, deliveryMode, token) => {
+export const removePromocode = async (cartId, deliveryMode) => {
   try {
-    const response = await axios.put(
+    const response = await securedAxios.put(
       `${BASE_URL}/customers/remove-promo-code`,
       { cartId, deliveryMode },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
     );
     return response.data;
   } catch (error) {
@@ -270,16 +256,11 @@ export const removePromocode = async (cartId, deliveryMode, token) => {
   }
 };
 
-export const confirmPickAndDropOrder = async (paymentMode, token) => {
+export const confirmPickAndDropOrder = async (paymentMode) => {
   try {
-    const response = await axios.post(
+    const response = await securedAxios.post(
       `${BASE_URL}/customers/confirm-pick-and-drop`,
-      { paymentMode },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      paymentMode,
     );
 
     // Handle empty (204) response

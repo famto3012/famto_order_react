@@ -122,7 +122,6 @@ export default function CategoryGrid({
 
             // Re-fetch vehicle charges
             const charges = await fetchVehicleCharges(
-              token,
               response.updatedCart._id
             );
 
@@ -274,7 +273,7 @@ export default function CategoryGrid({
         if (response?.cartId) {
           onCartIdReceived && onCartIdReceived(response.cartId);
 
-          const charges = await fetchVehicleCharges(token, response.cartId);
+          const charges = await fetchVehicleCharges(response.cartId);
           if (vehicleChargesCallback) {
             vehicleChargesCallback?.(charges); // Send to parent
           }
@@ -313,7 +312,6 @@ export default function CategoryGrid({
           onCartIdReceived?.(response.updatedCart._id);
 
           const charges = await fetchVehicleCharges(
-            token,
             response.updatedCart._id
           );
           if (vehicleChargesCallback) {

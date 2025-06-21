@@ -51,11 +51,11 @@ const Pick_Drop = () => {
       alert("Please select a vehicle.");
       return;
     }
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      alert("You're not logged in.");
-      return;
-    }
+    // const token = localStorage.getItem("authToken");
+    // if (!token) {
+    //   alert("You're not logged in.");
+    //   return;
+    // }
     const vehicleType = selectedVehicle.vehicleType;
     const deliveryCharges = selectedVehicle.deliveryCharges;
     const surgeCharges = selectedVehicle.surgeCharges || 0;
@@ -64,11 +64,10 @@ const Pick_Drop = () => {
         vehicleType,
         deliveryCharges,
         surgeCharges,
-        token
       );
       navigate("/checkout", { state: { confirmationData: response } });
       console.log("API success:", response);
-      console.log(vehicleType, deliveryCharges, surgeCharges, token);
+      console.log(vehicleType, deliveryCharges, surgeCharges);
     } catch (err) {
       console.error("API call failed", err);
     }
@@ -322,7 +321,7 @@ const Pick_Drop = () => {
             <FaArrowRight className="transform transition-transform duration-300 group-hover:translate-x-2" />
           </button>
         </div>
-        {orderId && <Cancel_Cart orderId={orderId} />}
+        {/* {orderId && <Cancel_Cart orderId={orderId} />} */}
    
     </main>
   );
