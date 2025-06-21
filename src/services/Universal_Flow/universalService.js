@@ -127,22 +127,12 @@ export const updateItemData = async (productId, newQuantity, variantTypeId) => {
 };
 
 export const updateCartDetail = async (formData) => {
-  const token = localStorage.getItem("authToken");
   console.log("Pay load", formData);
   try {
-    const response = await axios.post(
-      ${BASE_URL}/customers/cart/add-details,
+    const response = await securedAxios.post(`${BASE_URL}/customers/cart/add-details`,
       {
     formData,
       },
-      {
-        headers: {
-          withCredentials:true,
-          Authorization: Bearer ${token},
-             "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      }
     );
     console.log(response.data);
     return response.data;
