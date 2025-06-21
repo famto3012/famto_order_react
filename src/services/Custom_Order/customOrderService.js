@@ -1,11 +1,12 @@
 import axios from "axios";
 import BASE_URL from "../../BaseURL";
+import securedAxios from "../../utils/SecuredAxios";
 
 export const addShop = async (payload) => {
   const token = localStorage.getItem("authToken");
 
   try {
-    const resposne = await axios.post(
+    const resposne = await securedAxios.post(
       `${BASE_URL}/customers/add-shop`,
       payload,
       {

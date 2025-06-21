@@ -31,6 +31,7 @@ const LoginPage = () => {
 
       // Store token in local storage
         localStorage.setItem("authToken", data.token);
+        localStorage.setItem("refreshToken", data.refreshToken);
      navigate(-1);
   
       // Handle success - save token or redirect

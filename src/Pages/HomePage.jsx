@@ -4,16 +4,15 @@ import { useNavigate } from "react-router";
 import deliveryAnimation from "../assets/delivery-gif.json";
 import pickAnimation from "../assets/pick.json";
 import customAnimation from "../assets/custom.json";
-import {
-  motion,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { TiShoppingCart } from "react-icons/ti";
+import { fetchCustomPickTimings } from "../services/Universal_Flow/universalService";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   const [showFirst, setShowFirst] = useState(true);
+  const [timings, setTimings] = useState(null);
 
   // Toggle between two texts every 3 seconds
   useEffect(() => {
@@ -22,6 +21,31 @@ const HomePage = () => {
     }, 2000); // Change text every 3 seconds
     return () => clearInterval(interval);
   }, []);
+
+useEffect(() => {
+  const fetchTimingsData = async () => {
+    const data = await fetchCustomPickTimings();
+    console.log(data);
+    setTimings(data);
+  };
+
+  fetchTimingsData();
+}, []);
+
+
+  const isWithinTimeRange = (start, end) => {
+    const now = new Date();
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+
+    const startTime = new Date(now);
+    startTime.setHours(startHour, startMinute, 0);
+
+    const endTime = new Date(now);
+    endTime.setHours(endHour, endMinute, 0);
+
+    return now >= startTime && now <= endTime;
+  };
 
   const text1Variants = {
     hidden: { opacity: 0, y: -5 },
@@ -47,16 +71,17 @@ const HomePage = () => {
           />
         </div>
         {/* <Lottie animationData={burgerAnimation} className="w-10 h-10"/> */}
-       <button
-  className="px-4 py-2 rounded-lg bg-white text-black shadow-md hover:bg-gray-100"
-  onClick={() => navigate('/login')}  // ✅ This delays execution until click
->
-  Login
-</button>
-
+        <button
+          className="px-4 py-2 rounded-lg bg-white text-black shadow-md hover:bg-gray-100"
+          onClick={() => navigate("/login")} // ✅ This delays execution until click
+        >
+          Login
+        </button>
       </header>
 
-      <div style={{ textAlign: "center", marginTop: "10px" , minHeight: "120px"}}>
+      <div
+        style={{ textAlign: "center", marginTop: "10px", minHeight: "120px" }}
+      >
         <AnimatePresence mode="wait">
           {showFirst ? (
             <motion.div
@@ -112,7 +137,39 @@ const HomePage = () => {
           <div
             key={index}
             className="relative h-100 w-fit-screen bg-white hover:bg-teal-300 p-6 mx-2 shadow-md rounded-2xl flex flex-col items-center hover:shadow-xl transition cursor-pointer overflow-visible"
-            onClick={() => navigate(service.route)}
+            onClick={() => {
+              const token = localStorage.getItem("authToken");
+
+              if (!token) {
+                navigate("/login");
+              }
+
+              if (service.route === "/pick-drop") {
+                const { startTime, endTime } = timings.pickAndDropOrderTimings;
+                if (!isWithinTimeRange(startTime, endTime)) {
+                  return alert(
+                    "Pick & Drop service is currently unavailable. Try between " +
+                      startTime +
+                      " - " +
+                      endTime
+                  );
+                }
+              }
+
+              if (service.route === "/custom-order") {
+                const { startTime, endTime } = timings.customOrderTimings;
+                if (!isWithinTimeRange(startTime, endTime)) {
+                  return alert(
+                    "Custom Order is currently unavailable. Try between " +
+                      startTime +
+                      " - " +
+                      endTime
+                  );
+                }
+              }
+
+              navigate(service.route);
+            }}
           >
             {/* Curved Effect */}
             <div className="absolute top-0 left-10 right-10 h-60 bg-gray-100 rounded-b-full"></div>
@@ -170,14 +227,13 @@ const HomePage = () => {
           </div>
         </div>
         {/* Sticky Icon (e.g., Support, Cart, Chat) */}
-<div
-  className="fixed bottom-4 right-4 z-50 bg-teal-500 hover:bg-teal-600 text-white p-3 rounded-full shadow-lg cursor-pointer transition"
-  onClick={() => navigate('/orders')} // Change route as needed
-  title="Need Help?"
->
- <TiShoppingCart size={30}/>
-</div>
-
+        <div
+          className="fixed bottom-4 right-4 z-50 bg-teal-500 hover:bg-teal-600 text-white p-3 rounded-full shadow-lg cursor-pointer transition"
+          onClick={() => navigate("/orders")} // Change route as needed
+          title="Need Help?"
+        >
+          <TiShoppingCart size={30} />
+        </div>
       </section>
     </main>
   );
