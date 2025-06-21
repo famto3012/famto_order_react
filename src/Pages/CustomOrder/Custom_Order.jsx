@@ -131,7 +131,7 @@ const CustomOrder = () => {
         },
       });
     } else {
-      alert("Failed to get cart ID");
+      alert("Error in add addrss");
     }
     console.log(response?.cartId);
   };

@@ -172,10 +172,10 @@ const Checkout = () => {
       console.error("❌ Failed to remove promocode:", error);
     }
   };
-  const token = localStorage.getItem("authToken");
+
 
   const confirmOrderMutation = useMutation({
-    mutationFn: () => confirmPickAndDropOrder(paymentMode, token),
+    mutationFn: () => confirmPickAndDropOrder(paymentMode),
     onSuccess: async (data) => {
       const { orderId, amount, success } = data;
 
@@ -183,7 +183,7 @@ const Checkout = () => {
 
       if (paymentMode === "cash") {
         alert("✅ Order placed. Pay on delivery.");
-        navigate("/pick-drop");
+        navigate("/");
       } else {
         if (!orderId || !amount) return alert("⚠️ Missing payment data.");
 
@@ -191,7 +191,8 @@ const Checkout = () => {
           const result = await verifyPickAndDropPayment(orderId, amount, token);
           if (result.success) {
             alert("✅ Payment successful!");
-            navigate(`/pick-drop/?orderId=${result.orderId}`); // ✅ Navigate from component
+            navigate("/");
+            // navigate(`/pick-drop/?orderId=${result.orderId}`); // ✅ Navigate from component
           } else {
             alert("❌ Payment failed");
           }
@@ -223,8 +224,9 @@ const Checkout = () => {
           {confirmationData?.items?.map((item, idx) => (
             <div
               key={idx}
-              className={`flex justify-between items-center px-2 py-3 rounded ${idx % 2 === 0 ? "bg-gray-100" : "bg-white"
-                }`}
+              className={`flex justify-between items-center px-2 py-3 rounded ${
+                idx % 2 === 0 ? "bg-gray-100" : "bg-white"
+              }`}
             >
               <span>{item.itemName}</span>
               <span>
@@ -262,10 +264,11 @@ const Checkout = () => {
                 <button
                   key={tip}
                   onClick={() => handleTipSelect(tip)}
-                  className={`flex-1 rounded-lg py-2 ${selectedTip === tip
-                    ? "bg-[#00CED1] text-white"
-                    : "bg-gray-200 text-black"
-                    }`}
+                  className={`flex-1 rounded-lg py-2 ${
+                    selectedTip === tip
+                      ? "bg-[#00CED1] text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
                 >
                   ₹ {tip}
                 </button>
@@ -273,7 +276,7 @@ const Checkout = () => {
 
               {/* If custom tip is selected, show it */}
               {typeof selectedTip === "number" &&
-                !presetTips.includes(selectedTip) ? (
+              !presetTips.includes(selectedTip) ? (
                 <button
                   onClick={handleCustomTipClick}
                   className="flex-1 bg-[#00CED1] text-white rounded-lg py-2"
@@ -464,8 +467,9 @@ const Checkout = () => {
         <div className="mt-4">
           <h3 className="text-gray-700 font-medium">Pay</h3>
           <button
-            className={`px-4 py-2 rounded-lg border ${paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
-              }`}
+            className={`px-4 py-2 rounded-lg border ${
+              paymentMode === "Online-payment" ? "bg-[#00CED1] text-white" : ""
+            }`}
             onClick={() => setPaymentMode("Online-payment")}
           >
             Online Payment
@@ -477,21 +481,15 @@ const Checkout = () => {
           className="w-full bg-[#00CED1] text-white font-medium
          mt-6 py-3 rounded-lg text-lg"
           onClick={() => {
-            if (!token) {
-              alert("You're not logged in.");
-              console.log("Payment Mode:", paymentMode);
-              return;
-            }
 
             if (!paymentMode) {
               alert("Please select a payment mode.");
-              console.log("Token:", token);
               return;
             }
 
             confirmOrderMutation.mutate();
             console.log("Payment Mode:", paymentMode);
-            console.log("Token:", token);
+           
           }}
         >
           Confirm Order
