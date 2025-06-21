@@ -257,10 +257,16 @@ export const removePromocode = async (cartId, deliveryMode) => {
 };
 
 export const confirmPickAndDropOrder = async (paymentMode) => {
+  const token = localStorage.getItem(`authToken`);
   try {
-    const response = await securedAxios.post(
+    const response = await axios.post(
       `${BASE_URL}/customers/confirm-pick-and-drop`,
-      paymentMode,
+      {paymentMode},{
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        withCredentials: true
+      }
     );
 
     // Handle empty (204) response
@@ -282,7 +288,7 @@ export const confirmPickAndDropOrder = async (paymentMode) => {
     return { success: false, orderId: null };
   }
 };
-export const verifyPickAndDropPayment = async (orderId, amount, token) => {
+export const verifyPickAndDropPayment = async (orderId, amount) => {
   return new Promise((resolve, reject) => {
     const rzp = new window.Razorpay({
       key: import.meta.env.VITE_APP_RAZORPAY_KEY,
@@ -301,13 +307,9 @@ export const verifyPickAndDropPayment = async (orderId, amount, token) => {
             razorpay_signature: response.razorpay_signature,
           };
 
-          const res = await axios.post(
+          const res = await securedAxios.post(
             `${BASE_URL}/customers/verify-pick-and-drop`,
             { paymentDetails },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true,
-            }
           );
 
           if (res.status === 200) {
@@ -329,16 +331,11 @@ export const verifyPickAndDropPayment = async (orderId, amount, token) => {
   });
 };
 
-export const cancelOrder = async (orderId, token) => {
+export const cancelOrder = async (orderId) => {
   try {
-    const res = await axios.post(
+    const res = await securedAxios.post(
       `${BASE_URL}/customers/cancel-pick-and-drop-order`,
       { orderId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
     );
 
     return res.status === 200
