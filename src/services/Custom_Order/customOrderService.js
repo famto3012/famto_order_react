@@ -71,30 +71,32 @@ export const updateItem = async (itemId, payload) => {
   return false;
 };
 
-export const addAddressData = async (payload) => {
-  const token = localStorage.getItem(`authToken`);
+export const addAddressData = async (formData) => {
+
   try {
-    const data = await axios.post(
+    const response = await securedAxios.post(
       `${BASE_URL}/customers/add-delivery-address`,
+      formData,
       {
-        deliveryAddressType: payload.selectedAddress.addressType,
-        instructionInDelivery: payload.instructions,
-      },
-      {
-        withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       }
     );
-    if (data.status === 200) {
-      console.log("Add Delviery Address", data.data);
-      return data.data;
+
+    if (response.status === 200) {
+      console.log("Add Delivery Address Success", response.data);
+      return response.data;
+    } else {
+      console.warn("Unexpected response:", response.status);
+      return null;
     }
   } catch (error) {
-    console.log(error);
+    console.error("Add Address API Error:", error.response?.data || error.message);
+    return null;
   }
 };
+
 
 export const confirmCustomOrder = async (cartId) => {
   console.log("Cart ID in controller", cartId);

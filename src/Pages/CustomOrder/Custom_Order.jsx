@@ -113,28 +113,85 @@ const CustomOrder = () => {
     setEditModalVisible(true);
   };
 
-  const handleSave = async () => {
-    const payload = {
-      selectedAddress,
-      instructions,
-    };
+//   const handleSave = async () => {
+//     const payload = {
+//       selectedAddress,
+//       instructions,
+//     };
+// console.log("ADDRESS DATa",payload.selectedAddress.type);
+//     const response = await addAddressData(payload);
+//     setSaveButtonClicked(true);
+//     console.log(response);
+//     setCartId(response?.cartId);
+//     if (response?.cartId) {
+//       navigate("/custom-checkout", {
+//         state: {
+//           cartId: response?.cartId, // ✅ pass it here
+//           confirmationData: response, // if needed later
+//         },
+//       });
+//     } else {
+//       alert("Error in add addrss");
+//     }
+//     console.log(response?.cartId);
+//   };
 
-    const response = await addAddressData(payload);
+
+const handleSave = async () => {
+  console.log("Selected Address", selectedAddress);
+
+  try {
+    const formDataToSend = new FormData();
+
+    // Always required
+    formDataToSend.append("deliveryAddressType", selectedAddress?.type || "");
+
+    // Only if type is "other"
+    if (selectedAddress?.type === "other") {
+      if (selectedAddress?.id && !selectedAddress?.isNewAddress) {
+        formDataToSend.append("deliveryAddressOtherAddressId", selectedAddress.id);
+      } else {
+        formDataToSend.append("newDeliveryAddress[fullName]", selectedAddress?.fullName || "");
+        formDataToSend.append("newDeliveryAddress[phoneNumber]", selectedAddress?.phoneNumber || "");
+        formDataToSend.append("newDeliveryAddress[flat]", selectedAddress?.flat || "");
+        formDataToSend.append("newDeliveryAddress[area]", selectedAddress?.area || "");
+        formDataToSend.append("newDeliveryAddress[landmark]", selectedAddress?.landmark || "");
+        formDataToSend.append("newDeliveryAddress[coordinates][0]", selectedAddress?.coordinates?.[0] || "");
+        formDataToSend.append("newDeliveryAddress[coordinates][1]", selectedAddress?.coordinates?.[1] || "");
+      }
+    }
+
+    // Instructions are always optional
+    formDataToSend.append("instructionInDelivery", instructions || "");
+
+    // Debug log
+    console.log("=== FormData Contents ===");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    const response = await addAddressData(formDataToSend);
     setSaveButtonClicked(true);
-    console.log(response);
+    console.log("Response:", response);
     setCartId(response?.cartId);
+
     if (response?.cartId) {
       navigate("/custom-checkout", {
         state: {
-          cartId: response?.cartId, // ✅ pass it here
-          confirmationData: response, // if needed later
+          cartId: response?.cartId,
+          confirmationData: response,
         },
       });
     } else {
-      alert("Error in add addrss");
+      alert("Error in adding address.");
     }
-    console.log(response?.cartId);
-  };
+  } catch (error) {
+    console.error("Save failed:", error);
+    alert("Failed to save address.");
+  }
+};
+
+
 
   const handleAnywhereShopSave = async () => {
     const payload = {
@@ -298,7 +355,7 @@ const CustomOrder = () => {
           </div>
         ))}
 
-        <Address onSelectAddress={(address) => setSelectedAddress(address)} />
+        <Address onSelectAddress={(selectedAddress) => setSelectedAddress(selectedAddress)} />
 
         <input
           type="text"

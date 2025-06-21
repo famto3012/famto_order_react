@@ -188,7 +188,7 @@ const Checkout = () => {
         if (!orderId || !amount) return alert("⚠️ Missing payment data.");
 
         try {
-          const result = await verifyPickAndDropPayment(orderId, amount, token);
+          const result = await verifyPickAndDropPayment(orderId, amount);
           if (result.success) {
             alert("✅ Payment successful!");
             navigate("/");
