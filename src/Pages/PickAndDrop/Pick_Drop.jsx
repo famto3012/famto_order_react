@@ -87,9 +87,8 @@ const Pick_Drop = () => {
   };
 
   return (
-    <main className="max-w-6xl mx-auto  overflow-hidden">
-     
-       <div className="rounded-lg shadow-lg ">
+    <main className=" overflow-hidden">
+       <div className="max-w-7xl mx-auto rounded-lg shadow-lg ">
           <div
             className="relative p-10 rounded-lg bg-cover bg-center bg-no-repeat"
             style={{
@@ -126,7 +125,7 @@ const Pick_Drop = () => {
                 </div>
 
                 {/* Card 3 */}
-                <div className="bg-[#00ced1] flex flex-col p-4 md:w-80 w-72 shadow-lg rounded-lg self-center smd:elf-start">
+                <div className="bg-[#00ced1] flex flex-col p-4 md:w-80 w-72 shadow-lg rounded-lg self-center md:self-start">
                   <p className="text-sm md:text-[18px] font-[500] text-white">
                     Fast and safe delivery
                   </p>
@@ -148,9 +147,9 @@ const Pick_Drop = () => {
           </div>
         </div>
 
-        <div className=" flex flex-col md:flex-row items-center justify-center  mt-12 relative gap-20 max-w-6xl mx-auto">
-          <div className="w-1/2 bg-gray-200 px-10 py-6 rounded-l-full relative">
-            <p className="font-[600] text-[20px] ms-5 md:ms-0">
+        <div className=" flex flex-col lg:flex-row items-center justify-center mt-12 relative gap-15 max-w-7xl md:mx-auto ">
+          <div className="w-72 sm:w-1/2 bg-gray-200 px-10 py-6 rounded-l-full relative">
+            <p className="font-[600]  text-sm md:text-[20px] ms-5 md:ms-0">
               {" "}
               Choose Pick Up Location
             </p>
@@ -168,15 +167,15 @@ const Pick_Drop = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-full p-8  absolute z-10">
+          <div className="bg-white rounded-full p-6 md:p-4 absolute z-10">
             <img src="/order/jeep.png" alt="truck" className="w-20 h-20" />
           </div>
-          <div className="w-1/2 bg-gray-200 px-10 py-6 rounded-r-full relative ">
-            <p className="font-[600] text-[20px] ms-5 md:m-0 mt-8 md:mt-0">
+          <div className="w-72 sm:w-1/2 bg-gray-200 px-10 md:py-6 rounded-r-full relative ">
+            <p className="font-[600] text-sm md:text-[20px] ms-5 md:m-0 mt-8 md:mt-0">
               {" "}
               Choose Drop Location
             </p>
-            <div className="flex items-center  gap-5 mt-2">
+            <div className="flex items-center gap-5 mt-2">
               <PersonPinCircleOutlinedIcon
                 sx={{ fontSize: 42 }}
                 className="md:mb-0 mb-12 md:mx-0 mx-auto"

@@ -56,7 +56,7 @@ const AddressSelector = ({
       const formatted = {
         Home: res.homeAddress
           ? {
-              id:res.id,
+              id: res.id,
               fullName: res.homeAddress.fullName,
               phoneNumber: res.homeAddress.phoneNumber,
               flat: res.homeAddress.flat,
@@ -84,7 +84,7 @@ const AddressSelector = ({
               if (!addr) return null; // skip undefined entries
 
               return {
-                id:addr.id,
+                id: addr.id,
                 fullName: addr.fullName || "",
                 phoneNumber: addr.phoneNumber || "",
                 flat: addr.flat || "",
@@ -250,7 +250,7 @@ const AddressSelector = ({
         ...savedAddress,
         type: formData.type,
         id: savedAddress.id,
-        isNewAddress: true, 
+        isNewAddress: true,
       };
 
       // ✅ OPTIONAL: Re-fetch address list from backend
@@ -368,47 +368,59 @@ const AddressSelector = ({
     setClearSignal(true);
   };
   return (
-    <div className="max-w-6xl mx-auto mt-12 ">
+    <div className="max-w-7xl mx-auto mt-12 ">
       <p className="font-[600] mb-5 text-[24px] ">Pick Up</p>
       {/* Buttons Row */}
-      <div className="flex items-center justify-between  ">
+      <div className="flex  items-center justify-between ">
         {[
           {
             label: "HOME",
             type: "home",
-            icon: <HomeOutlinedIcon fontSize="large" />,
+            icon:(
+               <HomeOutlinedIcon className="hidden md:inline text-2xl" />
+            ),
           },
           {
             label: "WORK",
             type: "work",
-            icon: <WorkOutlineOutlinedIcon fontSize="large" />,
+            icon: (
+              <WorkOutlineOutlinedIcon className="hidden md:inline text-2xl" />
+            ),
           },
           {
             label: "OTHERS",
             type: "other",
-            icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
+            icon: (
+              <MapsHomeWorkOutlinedIcon className="hidden md:inline text-2xl" />
+            ),
           },
           {
             label: "ADD",
             type: "add",
-            icon: <AddLocationAltOutlinedIcon fontSize="large" />,
+            icon: (
+              <>
+                <AddLocationAltOutlinedIcon className="hidden md:inline text-xl" />{" "}
+              </>
+            ),
           },
         ].map(({ type, icon, label }) => (
           <button
             key={type}
             type="button"
-            className={`py-3 px-20 rounded-lg  transition ${
+            className={`py-2 px-4 flex flex-row items-center justify-center gap-2 rounded-lg  text-md md:text-[20px] transition ${
               selectedPickup === type
-                ? "bg-[#00ced1] text-white text-[20px]"
-                : "bg-gray-300 text-[20px]"
-            }`}
+                ? "bg-[#00ced1] text-white "
+                : "bg-gray-300"
+            }
+             ${type === "add" ? "w-[50px] md:w-[20%]" : "w-[25%] md:w-[20%]"}
+            `}
             onClick={() =>
               type === "add"
                 ? (setFormPurpose("pickup"), setFormVisible(true))
                 : handleSelectPickup(type)
             }
           >
-            {icon} {label}
+               <span className={`${type === "add" ? "inline" : "hidden md:inline"}`}>{icon}</span> <span className={`${type === "add" ? "hidden md:inline" : "inline"}`}>{label}</span>
           </button>
         ))}
       </div>
@@ -471,44 +483,56 @@ const AddressSelector = ({
       {selectedPickup && (
         <div>
           <p className="font-[600] mb-5 text-[24px]">Drop</p>
-          <div className="flex items-center justify-between  ">
+          <div className="flex items-center justify-between">
             {[
               {
                 label: "HOME",
                 type: "home",
-                icon: <HomeOutlinedIcon fontSize="large" />,
+                icon:(
+               <HomeOutlinedIcon className="hidden md:inline text-2xl" />
+                ),
               },
               {
                 label: "WORK",
                 type: "work",
-                icon: <WorkOutlineOutlinedIcon fontSize="large" />,
+                icon: (
+              <WorkOutlineOutlinedIcon className="hidden md:inline text-2xl" />
+            ),
               },
               {
                 label: "OTHERS",
                 type: "other",
-                icon: <MapsHomeWorkOutlinedIcon fontSize="large" />,
+                icon: (
+              <MapsHomeWorkOutlinedIcon className="hidden md:inline text-2xl" />
+            ),
               },
               {
                 label: "ADD",
                 type: "add",
-                icon: <AddLocationAltOutlinedIcon fontSize="large" />,
+              icon: (
+              <>
+                <AddLocationAltOutlinedIcon className="hidden md:inline text-xl" />{" "}
+              </>
+            ),
               },
             ].map(({ type, icon, label }) => (
               <button
                 key={type}
                 type="button"
-                className={`py-3 px-20 rounded-lg transition ${
+                className={`py-2 px-4 flex flex-row items-center justify-center gap-2 rounded-lg  text-md md:text-[20px] transition ${
                   selectedDrop === type
-                    ? "bg-[#00ced1] text-white text-[20px]"
-                    : "bg-gray-300 text-[20px]"
-                }`}
+                    ? "bg-[#00ced1] text-white "
+                    : "bg-gray-300"
+                }
+               ${type === "add" ? "w-[50px] md:w-[20%]" : "w-[25%] md:w-[20%]"}
+                `}
                 onClick={() =>
                   type === "add"
                     ? (setFormPurpose("drop"), setFormVisible(true))
                     : handleSelectDrop(type)
                 }
               >
-                {icon} {label}
+               <span className={`${type === "add" ? "inline" : "hidden md:inline"}`}>{icon}</span> <span className={`${type === "add" ? "hidden md:inline" : "inline"}`}>{label}</span>
               </button>
             ))}
           </div>
