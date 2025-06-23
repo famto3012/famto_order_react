@@ -65,9 +65,9 @@ useEffect(() => {
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
           <img
-            src="/order/black_logo.png"
+            src="/order/logo.png"
             alt="Famto Logo"
-            className="w-18 h-6"
+            className="w-38 h-8"
           />
         </div>
         {/* <Lottie animationData={burgerAnimation} className="w-10 h-10"/> */}
