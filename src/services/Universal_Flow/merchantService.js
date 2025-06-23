@@ -12,10 +12,6 @@ export const fetchMerchantsByCategory = async (businessCategoryId, token, latitu
         page: 1,
         limit: 1000,
       },
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return response.data || [];
   } catch (error) {
