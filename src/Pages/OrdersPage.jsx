@@ -128,7 +128,7 @@ const OrdersPage = () => {
             Play Store
           </a>
           <a
-            href="https://www.apple.com/app-store/"
+            href="https://apps.apple.com/in/app/famto-food-delivery-shopping/id6747160693"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-black text-white px-5 py-3 rounded-xl flex items-center gap-2 hover:bg-gray-800 transition"
