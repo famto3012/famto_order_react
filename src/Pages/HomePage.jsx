@@ -213,11 +213,11 @@ useEffect(() => {
             <div className="mt-5 flex gap-2">
               <a href="">
                 <img
-                  src="/order/play-store.png"
+                  src="https://play.google.com/store/apps/details?id=com.famto.customerapp&pcampaignid=web_share"
                   className="p-1 h-12 border md:border-gray-800 rounded-lg border-white"
                 />
               </a>
-              <a href="">
+              <a href="https://apps.apple.com/in/app/famto-food-delivery-shopping/id6747160693">
                 <img
                   src="/order/app-store.png"
                   className="p-1 h-12 border md:border-gray-800 rounded-lg border-white"
