@@ -1,44 +1,51 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaClosedCaptioning, FaCross, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { sendItemData } from "../../../services/Universal_Flow/universalService";
+import { deleteCart, sendItemData } from "../../../services/Universal_Flow/universalService";
 import { useCart } from "../../../context/CartContext";
+import { IoMdCloseCircleOutline } from "react-icons/io";
 
-
-const FloatingCart = ({merchantId, businessCategoryId }) => {
-  
+const FloatingCart = ({ merchantId, businessCategoryId }) => {
   const navigate = useNavigate();
   const { cart } = useCart();
   const itemCount = Object.values(cart).reduce((a, b) => a + b.quantity, 0);
 
-const cartInitialize = async () => {
-  const payload = {
-    merchantId: merchantId || "",
-    items: Object.entries(cart).map(([productId, item]) => ({
-      productId: productId,
-      quantity: item.quantity,
-      price: item.price,
-      variantTypeId: item.variantTypeId,
-    })),
+  const cartInitialize = async () => {
+    const payload = {
+      merchantId: merchantId || "",
+      items: Object.entries(cart).map(([productId, item]) => ({
+        productId: productId,
+        quantity: item.quantity,
+        price: item.price,
+        variantTypeId: item.variantTypeId,
+      })),
+    };
+
+    try {
+      const data = await sendItemData(payload);
+      console.log("Cart Data sent", cart);
+      navigate(`/checkout-page`, { state: { cart, businessCategoryId, merchantId } });
+    } catch (error) {
+      console.error(error);
+
+      if (
+        error?.response?.status === 401 ||
+        error?.message === "User not authenticated"
+      ) {
+        navigate("/login"); // ✅ Navigate to login
+      }
+    }
   };
 
-  try {
-    const data = await sendItemData(payload);
-    console.log("Cart Data sent", cart);
-    navigate(`/checkout-page`, { state: { cart ,businessCategoryId} });
-  } catch (error) {
-    console.error(error);
-
-    if (
-      error?.response?.status === 401 ||
-      error?.message === "User not authenticated"
-    ) {
-      navigate("/login"); // ✅ Navigate to login
+  const handleDeleteCart = async (cartId) => {
+    try {
+      console.log("CART ID", cartId);
+      const response = await deleteCart(cartId);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
     }
-  }
-};
-
-
+  };
 
   return (
     <AnimatePresence>
@@ -63,12 +70,18 @@ const cartInitialize = async () => {
               <div className="font-bold text-lg">{itemCount} items</div>
             </div>
           </div>
-          <button
-            className="bg-white text-[#00CED1] font-bold px-5 py-2 rounded-full shadow hover:bg-gray-100 transition duration-200"
-            onClick={cartInitialize}
-          >
-            View Cart
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              className="bg-white text-[#00CED1] font-bold px-5 py-2 rounded-full shadow hover:bg-gray-100 transition duration-200"
+              onClick={cartInitialize}
+            >
+              View Cart
+            </button>
+            <IoMdCloseCircleOutline
+              size={32}
+              onClick={() => handleDeleteCart(cart.cartId)}
+            />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

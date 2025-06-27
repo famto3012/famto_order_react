@@ -43,7 +43,7 @@ export const fetchProducts = async (categoryId, page, limit) => {
 
 export const fetchMerchantBanner = async (merchantId) => {
   const response = await securedAxios.get(
-    `${BASE_URL}/customers/merchant-banner/${merchantId}`,
+    `${BASE_URL}/customers/merchant-banner/${merchantId}`
   );
   console.log("Banner", response);
   return response?.data || [];
@@ -69,7 +69,7 @@ export const searchProducts = async (merchantId, searchText) => {
 export const fetchVariants = async (productId) => {
   try {
     const response = await securedAxios.get(
-      `${BASE_URL}/customers/merchant/product/${productId}/variants`,
+      `${BASE_URL}/customers/merchant/product/${productId}/variants`
     );
     console.log("Fetched variants", response.data);
     return response.data;
@@ -96,32 +96,39 @@ export const sendItemData = async (payload) => {
   }
 };
 
-export const clearCart = async(cartId) => {
+export const clearCart = async (cartId) => {
   try {
-    const resposne = await securedAxios.delete(`${BASE_URL}/customers/clear-cart`,{
-      params : {
-        cartId : cartId
+    const resposne = await securedAxios.delete(
+      `${BASE_URL}/customers/clear-cart`,
+      {
+        params: {
+          cartId: cartId,
+        },
       }
-    });
-    console.log('Cart Cleared Succesfully');
+    );
+    console.log("Cart Cleared Succesfully");
     return resposne.data;
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};
 
 export const updateItemData = async (productId, newQuantity, variantTypeId) => {
   try {
-    const response = await securedAxios.put(`${BASE_URL}/customers/update-cart`, {
-      productId,
-      quantity: newQuantity,
-      variantTypeId,
-    });
+    const response = await securedAxios.put(
+      `${BASE_URL}/customers/update-cart`,
+      {
+        productId,
+        quantity: newQuantity,
+        variantTypeId,
+      }
+    );
 
     console.log("🛒 Item updated successfully:", response.status);
     return response.data;
   } catch (error) {
-    console.error("❌ Error updating cart item:", error.response?.data || error.message);
+    console.error(
+      "❌ Error updating cart item:",
+      error.response?.data || error.message
+    );
     throw error; // so calling code can handle it
   }
 };
@@ -129,7 +136,10 @@ export const updateItemData = async (productId, newQuantity, variantTypeId) => {
 export const updateCartDetail = async (data) => {
   console.log("Pay load", data);
   try {
-    const response = await securedAxios.post(`${BASE_URL}/customers/cart/add-details`, data);
+    const response = await securedAxios.post(
+      `${BASE_URL}/customers/cart/add-details`,
+      data
+    );
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -140,8 +150,10 @@ export const updateCartDetail = async (data) => {
 
 export const fetchMapplsAuthToken = async (navigate) => {
   try {
-    const response = await securedAxios.get(`${BASE_URL}/token/get-auth-token`, {
-    });
+    const response = await securedAxios.get(
+      `${BASE_URL}/token/get-auth-token`,
+      {}
+    );
     // if (!response.ok) throw new Error("Token fetch failed");
 
     const data = await response.data;
@@ -157,11 +169,14 @@ export const fetchMapplsAuthToken = async (navigate) => {
 
 export const fetchBill = async (cartId, token) => {
   try {
-    const response = await securedAxios.get(`${BASE_URL}/customers/get-cart-bill`, {
-      params: {
-        cartId,
-      },
-    });
+    const response = await securedAxios.get(
+      `${BASE_URL}/customers/get-cart-bill`,
+      {
+        params: {
+          cartId,
+        },
+      }
+    );
     return response.data || [];
   } catch (error) {
     console.error(
@@ -176,7 +191,7 @@ export const confirmOrder = async (paymentMode, token) => {
   try {
     const response = await securedAxios.post(
       `${BASE_URL}/customers/confirm-order`,
-      { paymentMode },
+      { paymentMode }
     );
 
     // Handle empty (204) response
@@ -219,7 +234,7 @@ export const verifyPayment = async (orderId, amount, token) => {
 
           const res = await securedAxios.post(
             `${BASE_URL}/customers/verify-payment`,
-            { paymentDetails },
+            { paymentDetails }
           );
 
           if (res.status === 200) {
@@ -244,7 +259,7 @@ export const verifyPayment = async (orderId, amount, token) => {
 export const fetchTemporaryOrders = async () => {
   try {
     const response = await securedAxios.get(
-      `${BASE_URL}/customers/get-temporary-order`,
+      `${BASE_URL}/customers/get-temporary-order`
     );
     if (response.status === 200) {
       console.log("Temporary Orders Fetched Succesfully", response.data);
@@ -290,8 +305,7 @@ export const cancelOrderById = async (orderId, deliveryMode) => {
 
 export const getAllOrders = async () => {
   try {
-    const response = await securedAxios.get(`${BASE_URL}/customers/orders`, {
-    });
+    const response = await securedAxios.get(`${BASE_URL}/customers/orders`, {});
     if (response.status === 200) {
       console.log(`All-Orders fetched Successfully`);
       return response.data;
@@ -304,10 +318,11 @@ export const getAllOrders = async () => {
 };
 
 export const fetchCustomerCart = async () => {
-
   try {
-    const response = await securedAxios.get(`${BASE_URL}/customers/get-cart`, {
-    });
+    const response = await securedAxios.get(
+      `${BASE_URL}/customers/get-cart`,
+      {}
+    );
     if (response.status === 200) {
       console.log("Cart Data", response.data);
       return response.data;
@@ -320,19 +335,33 @@ export const fetchCustomerCart = async () => {
 };
 
 export const fetchCustomPickTimings = async () => {
-
   try {
-    const response = await securedAxios.get(
-      `${BASE_URL}/customers/customization/timings`,
+    const response = await axios.get(
+      `${BASE_URL}/customers/customization/timings`
     );
     console.log(response.data);
     return response.data;
   } catch (error) {
     if (error.response?.status === 401) {
       console.error("Unauthorized - Token may be expired");
+      return 401;
     } else {
       console.error("Error fetching custom pick timings:", error.message);
     }
     return null;
+  }
+};
+
+export const deleteCart = async (cartId) => {
+  try {
+    const data = await securedAxios.delete(`${BASE_URL}/customers/clear-cart`, {
+      params: {
+        cartId: cartId,
+      },
+    });
+    console.log("Cart Cleared succesfully");
+    return data.data;
+  } catch (error) {
+    console.log("Error in clear cart");
   }
 };

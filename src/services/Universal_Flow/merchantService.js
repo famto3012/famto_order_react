@@ -2,39 +2,46 @@ import axios from "axios";
 import BASE_URL from "../../BaseURL";
 import securedAxios from "../../utils/SecuredAxios";
 
-export const fetchMerchantsByCategory = async (businessCategoryId, token, latitude, longitude) => {
+export const fetchMerchantsByCategory = async (
+  businessCategoryId,
+  token,
+  latitude,
+  longitude
+) => {
   try {
-    const response = await axios.get(`${BASE_URL}/customers/filter-and-search-merchants`, {
-      params: {
-        latitude,
-        longitude,
-        businessCategoryId,
-        page: 1,
-        limit: 1000,
-      },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/customers/filter-and-search-merchants`,
+      {
+        params: {
+          latitude,
+          longitude,
+          businessCategoryId,
+          page: 1,
+          limit: 1000,
+        },
+      }
+    );
     return response.data || [];
   } catch (error) {
-    console.error("Merchant fetch failed:", error.response?.data || error.message);
+    console.error(
+      "Merchant fetch failed:",
+      error.response?.data || error.message
+    );
     return [];
   }
 };
-
 
 export const fetchMerchantData = async (merchantId) => {
   const latitude = 8.56123;
   const longitude = 71.86224;
   try {
-    const response = await axios.get(
-      `${BASE_URL}/customers/merchant-data`,
-      {
-        params: {
-          merchantId,
-          longitude,
-          latitude,
-        },
-      }
-    );
+    const response = await axios.get(`${BASE_URL}/customers/merchant-data`, {
+      params: {
+        merchantId,
+        longitude,
+        latitude,
+      },
+    });
     console.log("Merchant-data", response.data);
     return response.data || [];
   } catch (error) {
@@ -56,4 +63,15 @@ export const toggleMerchantFavourite = async (
     console.log("Favourite Merchant", data);
     return data.data || [];
   } catch (error) {}
+};
+
+export const fetchDeliveryOption = async (merchantId) => {
+  try {
+    const response = await securedAxios.get(
+      `${BASE_URL}/customers/merchant/${merchantId}/delivery-option`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };

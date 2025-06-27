@@ -22,16 +22,15 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-useEffect(() => {
-  const fetchTimingsData = async () => {
-    const data = await fetchCustomPickTimings();
-    console.log(data);
-    setTimings(data);
-  };
+  useEffect(() => {
+    const fetchTimingsData = async () => {
+      const data = await fetchCustomPickTimings();
+      console.log(data);
+      setTimings(data);
+    };
 
-  fetchTimingsData();
-}, []);
-
+    fetchTimingsData();
+  }, []);
 
   const isWithinTimeRange = (start, end) => {
     const now = new Date();
@@ -64,11 +63,7 @@ useEffect(() => {
       {/* Header */}
       <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-2">
-          <img
-            src="/order/logo.png"
-            alt="Famto Logo"
-            className="w-38 h-8"
-          />
+          <img src="/order/logo.png" alt="Famto Logo" className="w-38 h-8" />
         </div>
         {/* <Lottie animationData={burgerAnimation} className="w-10 h-10"/> */}
         <button
@@ -140,10 +135,10 @@ useEffect(() => {
             onClick={() => {
               const token = localStorage.getItem("authToken");
 
+              console.log("Token",token);
               if (!token) {
                 navigate("/login");
               }
-
               if (service.route === "/pick-drop") {
                 const { startTime, endTime } = timings.pickAndDropOrderTimings;
                 if (!isWithinTimeRange(startTime, endTime)) {
@@ -211,9 +206,9 @@ useEffect(() => {
           </h3>
           <div className="flex gap-4">
             <div className="mt-5 flex gap-2">
-              <a href="">
+              <a href="https://play.google.com/store/apps/details?id=com.famto.customerapp&pcampaignid=web_share">
                 <img
-                  src="https://play.google.com/store/apps/details?id=com.famto.customerapp&pcampaignid=web_share"
+                  src="/order/play-store.png"
                   className="p-1 h-12 border md:border-gray-800 rounded-lg border-white"
                 />
               </a>
