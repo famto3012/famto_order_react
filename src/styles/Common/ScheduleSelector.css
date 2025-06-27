@@ -1,0 +1,67 @@
+/* Container Card */
+.schedule-container {
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+.schedule-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: #2563eb; /* blue-600 */
+}
+
+/* Label */
+.schedule-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151; /* gray-700 */
+}
+
+/* Inputs */
+.schedule-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 8px;
+  outline: none;
+  font-size: 16px;
+}
+
+.schedule-input:focus {
+  border-color: #2563eb; /* blue-600 */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+}
+
+/* Button */
+.schedule-button {
+  width: 100%;
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.schedule-button:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+/* On-demand Heading */
+.ondemand-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #059669; /* green-600 */
+}

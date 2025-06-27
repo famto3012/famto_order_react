@@ -335,9 +335,13 @@ const Order_Confirm = () => {
           {/* Expanded Detail Section */}
           {expanded && billDetails && (
             <div className="bg-white  border-gray-200 border-2 rounded-lg p-4 space-y-3 text-gray-700 shadow-sm">
+                <div className="flex justify-between">
+                <span className="font-medium">Item Totals</span>
+                <span>₹{billDetails.itemTotal}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="font-medium">Delivery Charges</span>
-                <span>₹{billDetails.deliveryChargePerDay}</span>
+                <span>₹{billDetails.originalDeliveryCharge}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Surge charges</span>
@@ -350,6 +354,10 @@ const Order_Confirm = () => {
               <div className="flex justify-between">
                 <span className="font-medium">Discount</span>
                 <span>₹{billDetails.discountedAmount ?? 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Sub Total</span>
+                <span>₹{(billDetails.subTotal ?? 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Taxes & Fees</span>

@@ -96,7 +96,7 @@ const OrdersPage = () => {
   const handleCancelOrder = async (orderId, deliveryMode) => {
     try {
       await cancelOrderById(orderId, deliveryMode);
-      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+      setOrders((prev) => prev.filter((order) => order.orderId !== orderId));
     } catch (error) {
       console.error("Error canceling order:", error);
     }
@@ -185,7 +185,7 @@ const OrdersPage = () => {
                 <span className="font-mono text-teal-600">{order.deliveryMode}</span>
               </p>
               <button
-                onClick={() => handleCancelOrder(order._id, order.deliveryMode)}
+                onClick={() => handleCancelOrder(order.orderId, order.deliveryMode)}
                 className="w-full py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-semibold"
               >
                 Cancel Order
