@@ -3,7 +3,7 @@ import { fetchVariants } from "../../../services/Universal_Flow/universalService
 import { useCart } from "../../../context/CartContext";
 
 const ProductCard = ({ product }) => {
-  const { cart, addToCart, increment, decrement } = useCart();
+  const { cart, addToCart, increment, decrement, merchantId } = useCart();
   const item = cart[product.productId];
   const quantity = item?.quantity || 0;
 
@@ -48,7 +48,7 @@ const ProductCard = ({ product }) => {
                 <button
                   className="text-green-600 text-xl font-bold"
                   onClick={() =>
-                    increment(product.productId, item?.variantTypeId)
+                    increment(product.productId, item?.variantTypeId, merchantId , product)
                   }
                 >
                   ＋
@@ -60,7 +60,7 @@ const ProductCard = ({ product }) => {
                 onClick={
                   product.variantAvailable
                     ? customize
-                    : () => addToCart(product)
+                    : () => addToCart(product, merchantId)
                 }
               >
                 {product.variantAvailable ? "Customize" : "Add"}

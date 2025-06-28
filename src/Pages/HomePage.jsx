@@ -7,6 +7,7 @@ import customAnimation from "../assets/custom.json";
 import { motion, AnimatePresence } from "framer-motion";
 import { TiShoppingCart } from "react-icons/ti";
 import { fetchCustomPickTimings } from "../services/Universal_Flow/universalService";
+import { initializeCart } from "../services/Pick_Drop/pickdropService";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -132,13 +133,21 @@ const HomePage = () => {
           <div
             key={index}
             className="relative h-100 w-fit-screen bg-white hover:bg-teal-300 p-6 mx-2 shadow-md rounded-2xl flex flex-col items-center hover:shadow-xl transition cursor-pointer overflow-visible"
-            onClick={() => {
+            onClick={async () => {
               const token = localStorage.getItem("authToken");
 
-              console.log("Token",token);
+              console.log("Token", token);
               if (!token) {
                 navigate("/login");
               }
+
+              try {
+                await initializeCart(); // Clear cart before navigation
+              } catch (error) {
+                alert("Something went wrong while initializing cart.",error);
+                return; // Stop if cart initialization fails
+              }
+
               if (service.route === "/pick-drop") {
                 const { startTime, endTime } = timings.pickAndDropOrderTimings;
                 if (!isWithinTimeRange(startTime, endTime)) {

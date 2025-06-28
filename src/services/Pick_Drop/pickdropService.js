@@ -347,6 +347,19 @@ export const cancelOrder = async (orderId) => {
     return { success: false, message: "Error while cancelling order" };
   }
 };
+
+export const initializeCart = async () => {
+  try {
+    const response = await securedAxios.delete(
+      `${BASE_URL}/customers/initialize-cart`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error initializing cart:", error);
+    throw error;
+  }
+};
+
 // export const confirmPickAndDropOrder = async (paymentMode, token) => {
 //   try {
 //     console.log("Calling API with:", paymentMode, token);
