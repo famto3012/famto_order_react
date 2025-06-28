@@ -6,6 +6,7 @@ import Address from "../Components/Address";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchDeliveryOption } from "../../services/Universal_Flow/merchantService";
 import ScheduleModal from "../Components/Modals/ScheduleModal";
+import { LuArrowRight, LuCalendarDays } from "react-icons/lu";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -61,9 +62,15 @@ const CheckoutPage = () => {
     const deliveryOption = await fetchDeliveryOption(merchantId);
     console.log("Delivery Option", deliveryOption);
 
+    // Check if merchant only accepts scheduled orders
     if (deliveryOption.deliveryOption === "Scheduled") {
-      alert("This merchant accepts only scheduled orders");
-      return false;
+      // Check if schedule is selected
+      if (!startDate || !selectedTime) {
+        alert(
+          "This merchant accepts only scheduled orders. Please select a schedule date and time."
+        );
+        return;
+      }
     }
 
     try {
@@ -122,6 +129,18 @@ const CheckoutPage = () => {
 
       // Super market order flag
       formDataToSend.append("isSuperMarketOrder", "false");
+
+     if (startDate || selectedTime) {
+      // formDataToSend.append("deliveryOption", "Scheduled");
+
+      const ifScheduled = {
+        startDate: startDate.toISOString(),
+        endDate: endDate ? endDate.toISOString() : startDate.toISOString(),
+        time: selectedTime,
+      };
+
+      formDataToSend.append("ifScheduled", JSON.stringify(ifScheduled));
+    }
 
       // Cart items validation
       console.log("cartItems structure:", cartItems);
@@ -301,7 +320,7 @@ const CheckoutPage = () => {
           />
         ) : null}
 
-        {scheduleShowOrder === "Scheduled" ? (
+        {scheduleShowOrder !== "On-demand" ? (
           <>
             <button
               onClick={() => setShowScheduleModal(true)}
@@ -318,6 +337,25 @@ const CheckoutPage = () => {
               </div>
               <LuArrowRight size={24} />
             </button>
+             {/* ✅ Show selected schedule here */}
+    {startDate && selectedTime ? (
+      <div className="mt-2 text-center text-sm text-gray-700">
+        <p>
+          <strong>Scheduled for:</strong>{" "}
+          {new Date(startDate).toLocaleDateString()} at {selectedTime}
+        </p>
+        {endDate && endDate !== startDate && (
+          <p>
+            <strong>End Date:</strong>{" "}
+            {new Date(endDate).toLocaleDateString()}
+          </p>
+        )}
+      </div>
+    ) : (
+      <div className="mt-2 text-center text-sm text-gray-400">
+        No schedule selected.
+      </div>
+    )}
           </>
         ) : (
           <></>

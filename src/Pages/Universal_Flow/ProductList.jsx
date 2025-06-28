@@ -63,7 +63,7 @@ const ProductList = () => {
     const loadInitialData = async () => {
       try {
         // Fetch cart first
-        await initializeCart();
+        await initializeCart(merchantId);
 
         // Load merchant and categories
         const merchantData = await fetchMerchantData(merchantId);

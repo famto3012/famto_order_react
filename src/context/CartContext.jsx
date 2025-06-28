@@ -71,7 +71,7 @@ export const CartProvider = ({ children }) => {
   const [cartProductDetails, setCartProductDetails] = useState([]);
   const [currentMerchantId, setCurrentMerchantId] = useState(null);
 
-  const initializeCart = async () => {
+  const initializeCart = async (merchantId) => {
     try {
       const data = await fetchCustomerCart();
       if (data) {

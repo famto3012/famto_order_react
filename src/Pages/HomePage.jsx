@@ -140,12 +140,13 @@ const HomePage = () => {
               if (!token) {
                 navigate("/login");
               }
-
-              try {
-                await initializeCart(); // Clear cart before navigation
-              } catch (error) {
-                alert("Something went wrong while initializing cart.",error);
-                return; // Stop if cart initialization fails
+              if (service.route !== "/home-delivery") {
+                try {
+                  await initializeCart(); // Clear cart before navigation
+                } catch (error) {
+                  alert("Something went wrong while initializing cart.", error);
+                  return; // Stop if cart initialization fails
+                }
               }
 
               if (service.route === "/pick-drop") {
