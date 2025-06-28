@@ -1,13 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FaClosedCaptioning, FaCross, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { deleteCart, sendItemData } from "../../../services/Universal_Flow/universalService";
+import {
+  clearCart,
+  sendItemData,
+} from "../../../services/Universal_Flow/universalService";
 import { useCart } from "../../../context/CartContext";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 
 const FloatingCart = ({ merchantId, businessCategoryId }) => {
   const navigate = useNavigate();
-  const { cart } = useCart();
+  const { cart, cartId, isLocalCart, setCart, cartProductDetails } = useCart();
   const itemCount = Object.values(cart).reduce((a, b) => a + b.quantity, 0);
 
   const cartInitialize = async () => {
@@ -17,14 +20,23 @@ const FloatingCart = ({ merchantId, businessCategoryId }) => {
         productId: productId,
         quantity: item.quantity,
         price: item.price,
-        variantTypeId: item.variantTypeId,
-      })),
+       variantTypeId: typeof item.variantTypeId === 'object' ? item.variantTypeId?.id : item.variantTypeId // ✅ FIX
+    })),
     };
 
     try {
       const data = await sendItemData(payload);
       console.log("Cart Data sent", cart);
-      navigate(`/checkout-page`, { state: { cart, businessCategoryId, merchantId } });
+      navigate(`/checkout-page`, {
+        state: {
+          cart,
+          cartId,
+          isLocalCart,
+          merchantId,
+          businessCategoryId,
+          cartProductDetails: !isLocalCart ? cartProductDetails : null,
+        },
+      });
     } catch (error) {
       console.error(error);
 
@@ -37,11 +49,17 @@ const FloatingCart = ({ merchantId, businessCategoryId }) => {
     }
   };
 
-  const handleDeleteCart = async (cartId) => {
+  const handleDeleteCart = async () => {
     try {
-      console.log("CART ID", cartId);
-      const response = await deleteCart(cartId);
-      console.log(response);
+      if (isLocalCart) {
+        console.log("Clearing local cart");
+        setCart({}); // Clear locally
+      } else {
+        console.log("Clearing API cart");
+        const response = await clearCart(cartId);
+        console.log(response);
+        setCart({}); // Also clear local state
+      }
     } catch (error) {
       console.log(error);
     }

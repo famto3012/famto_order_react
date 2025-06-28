@@ -12,6 +12,7 @@ import CategoryList from "../Components/ProductLists/CategoryList";
 import ProductCard from "../Components/ProductLists/ProductCard";
 import FloatingCart from "../Components/ProductLists/FloatingCart";
 import MerchantBanner from "../Components/ProductLists/MerchantBanner";
+import { useCart } from "../../context/CartContext";
 
 const ProductList = () => {
   const { state } = useLocation();
@@ -28,10 +29,43 @@ const ProductList = () => {
   const [searchResults, setSearchResults] = useState([]);
   const debounceTimeout = useRef(null);
   const productRef = useRef(null);
+  const { initializeCart } = useCart();
+  // useEffect(() => {
+  //   const loadInitialData = async () => {
+  //     try {
+  //       const merchantData = await fetchMerchantData(merchantId);
+  //       const categoryData = await fetchMerchantCategories(
+  //         merchantId,
+  //         businessCategoryId,
+  //         1,
+  //         200
+  //       );
+  //       const fetchedCategories = categoryData?.data || [];
+  //       const defaultCategoryId =
+  //         fetchedCategories[0]?.category?.categoryId ||
+  //         fetchedCategories[0]?.categoryId;
+
+  //       setMerchant(merchantData);
+  //       setCategories(fetchedCategories);
+  //       setSelectedCategoryId(defaultCategoryId);
+
+  //       const productData = await fetchProducts(defaultCategoryId, 1, 200);
+  //       setProducts(productData?.data || []);
+  //     } catch (err) {
+  //       console.error("Load Error:", err);
+  //     }
+  //   };
+
+  //   loadInitialData();
+  // }, [merchantId, businessCategoryId]);
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        // Fetch cart first
+        await initializeCart();
+
+        // Load merchant and categories
         const merchantData = await fetchMerchantData(merchantId);
         const categoryData = await fetchMerchantCategories(
           merchantId,

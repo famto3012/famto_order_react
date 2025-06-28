@@ -97,18 +97,17 @@ export const sendItemData = async (payload) => {
 };
 
 export const clearCart = async (cartId) => {
+  console.log("CART",cartId);
   try {
-    const resposne = await securedAxios.delete(
-      `${BASE_URL}/customers/clear-cart`,
-      {
-        params: {
-          cartId: cartId,
-        },
-      }
+    const response = await securedAxios.delete(
+      `${BASE_URL}/customers/clear-cart/${cartId}`
     );
-    console.log("Cart Cleared Succesfully");
-    return resposne.data;
-  } catch (error) {}
+    console.log("Cart Cleared Successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to clear cart:", error);
+    throw error; // Optional, allows caller to show error message
+  }
 };
 
 export const updateItemData = async (productId, newQuantity, variantTypeId) => {
@@ -349,19 +348,5 @@ export const fetchCustomPickTimings = async () => {
       console.error("Error fetching custom pick timings:", error.message);
     }
     return null;
-  }
-};
-
-export const deleteCart = async (cartId) => {
-  try {
-    const data = await securedAxios.delete(`${BASE_URL}/customers/clear-cart`, {
-      params: {
-        cartId: cartId,
-      },
-    });
-    console.log("Cart Cleared succesfully");
-    return data.data;
-  } catch (error) {
-    console.log("Error in clear cart");
   }
 };
