@@ -5,11 +5,6 @@ import { updateCartDetail } from "../../services/Universal_Flow/universalService
 import Address from "../Components/Address";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchDeliveryOption } from "../../services/Universal_Flow/merchantService";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { LuArrowRight, LuCalendarDays } from "react-icons/lu";
-import "react-time-picker/dist/TimePicker.css";
-import "react-clock/dist/Clock.css";
 import ScheduleModal from "../Components/Modals/ScheduleModal";
 
 const CheckoutPage = () => {
