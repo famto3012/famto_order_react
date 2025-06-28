@@ -108,7 +108,12 @@ import axios from "axios";
 import BASE_URL from "../../BaseURL";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../config/firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from "firebase/auth";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  PhoneAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 
 const LoginPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -141,7 +146,9 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error("Error setting up reCAPTCHA:", error);
-      setError("Failed to initialize verification. Please refresh and try again.");
+      setError(
+        "Failed to initialize verification. Please refresh and try again."
+      );
     }
   };
 
@@ -208,10 +215,13 @@ const LoginPage = () => {
         referralCode,
         latitude,
         longitude,
-        firebaseToken: idToken // Send Firebase token to backend for verification
+        firebaseToken: idToken, // Send Firebase token to backend for verification
       };
 
-      const response = await axios.post(`${BASE_URL}/customers/authenticate`, payload);
+      const response = await axios.post(
+        `${BASE_URL}/customers/authenticate`,
+        payload
+      );
       const data = response.data;
 
       // Store token in local storage
@@ -219,7 +229,6 @@ const LoginPage = () => {
       navigate(-1);
 
       alert("Login successful!");
-
     } catch (err) {
       console.error("Error verifying OTP:", err);
       setError(err.response?.data?.message || "Invalid OTP. Please try again.");
@@ -272,7 +281,9 @@ const LoginPage = () => {
         <div className="flex-1 flex flex-col justify-center p-6">
           {!showOTPInput ? (
             <>
-              <h2 className="text-2xl font-semibold text-center mb-6">Login / Sign up</h2>
+              <h2 className="text-2xl font-semibold text-center mb-6">
+                Login / Sign up
+              </h2>
               <form onSubmit={sendOTP} className="space-y-4">
                 <input
                   type="tel"

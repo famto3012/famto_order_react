@@ -7,6 +7,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5174,
-    allowedHosts: ["order.famtp.in"]
+    allowedHosts: ["order.famto.in", "www.famto.in"],
   },
 });
