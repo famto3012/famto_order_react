@@ -224,8 +224,12 @@ const LoginPage = () => {
       );
       const data = response.data;
 
-      // Store token in local storage
-      localStorage.setItem("authToken", data.token);
+       localStorage.setItem("authToken", data.token);
+    localStorage.setItem("refreshToken", data.refreshToken);
+
+    // ✅ Update Zustand store too
+    useAuthStore.getState().setToken(data.token);
+    useAuthStore.getState().setRefreshToken(data.refreshToken);
       navigate(-1);
 
       alert("Login successful!");
