@@ -1,12 +1,17 @@
 // src/components/MerchantLists/MerchantLists.jsx
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchMerchantsByCategory } from "../../services/Universal_Flow/merchantService.js";
 import "../../styles/Universal_Flow/merchantStyles.css";
 
 const MerchantLists = () => {
   const { state } = useLocation();
-  const { businessCategoryId, category } = state || {};
+  const { category } = state || {};
+    // const { state } = useLocation();
+  const { merchantId: merchantIdFromUrl, businessCategoryId: businessCategoryIdFromUrl } = useParams();
+
+  const merchantId = state?.merchantId || merchantIdFromUrl;
+  const businessCategoryId = state?.businessCategoryId || businessCategoryIdFromUrl;
   const [merchantList, setMerchantList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -53,13 +58,21 @@ const MerchantLists = () => {
                     isClosed ? "bg-gray-300 pointer-events-none opacity-50" : ""
                   }`}
                   onClick={() => {
-                    if (!isClosed) {
-                      navigate("/products", {
-                        state: {
-                          merchantId: merchant.id,
-                          businessCategoryId: businessCategoryId,
-                        },
-                      });
+                    if (!isClosed) {  
+                   navigate(`/merchant/${merchant.id}/${businessCategoryId}/products`, {
+  state: {
+    merchantId: merchant.id,
+    businessCategoryId,
+  },
+});
+
+
+                      // navigate("/products", { 
+                      //   state: {
+                      //     merchantId: merchant.id,
+                      //     businessCategoryId: businessCategoryId,
+                      //   },
+                      // });
                     }
                   }}
                 >
