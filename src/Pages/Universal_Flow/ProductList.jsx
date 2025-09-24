@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { fetchMerchantData } from "../../services/Universal_Flow/merchantService";
 import {
   fetchMerchantCategories,
@@ -16,20 +16,22 @@ import { useCart } from "../../context/CartContext";
 
 const ProductList = () => {
   const { state } = useLocation();
-  const merchantId = state?.merchantId;
-  const businessCategoryId = state?.businessCategoryId;
+  const { merchantId: merchantIdFromUrl, businessCategoryId: businessCategoryIdFromUrl } = useParams();
+
+  const merchantId = state?.merchantId || merchantIdFromUrl;
+  const businessCategoryId = state?.businessCategoryId || businessCategoryIdFromUrl;
 
   const [merchant, setMerchant] = useState({});
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState({}); 
 
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const debounceTimeout = useRef(null);
   const productRef = useRef(null);
-  const { initializeCart } = useCart();
+  const { initializeCart } = useCart(); 
   // useEffect(() => {
   //   const loadInitialData = async () => {
   //     try {

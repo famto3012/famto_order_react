@@ -39,9 +39,9 @@ const MerchantCard = ({ merchant,businessCategoryId, setSearchText, searchText }
           <div className="flex items-center gap-2 mt-1">
             <IoMdClock /> {merchant.deliveryTime} min
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          {/* <div className="flex items-center gap-2 mt-1">
             <GiPathDistance /> {merchant.distanceInKM} KM
-          </div>
+          </div> */}
           <div className="mt-1 font-semibold text-yellow-500">{merchant.rating} ★</div>
         </div>
 

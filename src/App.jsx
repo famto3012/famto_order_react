@@ -23,7 +23,8 @@ function App() {
         <Route path="/home-delivery" element={<Home_Delivery />} />
         <Route path="/merchants" element={<MerchantLists />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/products" element={<ProductList />} />
+        {/* <Route path="/products" element={<ProductList />} /> */}
+        <Route path="/merchant/:merchantId/:businessCategoryId/products" element={<ProductList />} /> 
         <Route path="/custom-order" element={<Custom_Order />} />
         <Route path="/checkout-page" element={<CheckoutPage />} />
         <Route path="/order-confirm" element={<Order_Confirm />} />
