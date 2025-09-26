@@ -33,6 +33,7 @@ const Order_Confirm = () => {
   const orderType = state?.orderType;
   const [selectedTip, setSelectedTip] = useState(null);
   const [billDetails, setBillDetails] = useState(null);
+  const [merchantId, setMerchantId] = useState(null);
   const [isOther, setIsOther] = useState(false);
   const [customTipInput, setCustomTipInput] = useState("");
   const presetTips = [10, 20, 50];
@@ -50,6 +51,7 @@ const Order_Confirm = () => {
     if (!token || !confirmationData?.cartId) return;
     const data = await fetchBill(confirmationData.cartId, token);
     setBillDetails(data?.billDetail || {});
+    setMerchantId(confirmationData?.merchantId || null);
   };
 
   useEffect(() => {
@@ -335,7 +337,7 @@ const Order_Confirm = () => {
           {/* Expanded Detail Section */}
           {expanded && billDetails && (
             <div className="bg-white  border-gray-200 border-2 rounded-lg p-4 space-y-3 text-gray-700 shadow-sm">
-                <div className="flex justify-between">
+              <div className="flex justify-between">
                 <span className="font-medium">Item Totals</span>
                 <span>₹{billDetails.itemTotal}</span>
               </div>
@@ -359,6 +361,13 @@ const Order_Confirm = () => {
                 <span className="font-medium">Sub Total</span>
                 <span>₹{(billDetails.subTotal ?? 0).toFixed(2)}</span>
               </div>
+              {merchantId === "M25093" && (
+                <div className="flex justify-between">
+                  <span className="font-medium">Parcel & Charity charges</span>
+                  <span>₹{13}</span>
+                </div>
+              )}
+
               <div className="flex justify-between">
                 <span className="font-medium">Taxes & Fees</span>
                 <span>₹{billDetails.taxAmount ?? 0}</span>
@@ -368,8 +377,9 @@ const Order_Confirm = () => {
                 <span className="font-medium">Grand Total</span>
                 <span>
                   ₹
-                  {billDetails.discountedGrandTotal ??
-                    billDetails.originalGrandTotal}
+                  {(billDetails.discountedGrandTotal ??
+                    billDetails.originalGrandTotal) +
+                    (merchantId === "M25093" ? 13 : 0)}
                 </span>
               </div>
             </div>

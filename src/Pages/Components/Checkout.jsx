@@ -43,6 +43,7 @@ const Checkout = () => {
     if (!token || !confirmationData?.cartId) return;
     const data = await fetchBillCharges(confirmationData.cartId, token);
     setBillDetails(data);
+    console.log("Fetched bill charges:", data);
   };
 
   useEffect(() => {
@@ -172,7 +173,6 @@ const Checkout = () => {
       console.error("❌ Failed to remove promocode:", error);
     }
   };
-
 
   const confirmOrderMutation = useMutation({
     mutationFn: () => confirmPickAndDropOrder(paymentMode),
@@ -481,7 +481,6 @@ const Checkout = () => {
           className="w-full bg-[#00CED1] text-white font-medium
          mt-6 py-3 rounded-lg text-lg"
           onClick={() => {
-
             if (!paymentMode) {
               alert("Please select a payment mode.");
               return;
@@ -489,7 +488,6 @@ const Checkout = () => {
 
             confirmOrderMutation.mutate();
             console.log("Payment Mode:", paymentMode);
-           
           }}
         >
           Confirm Order

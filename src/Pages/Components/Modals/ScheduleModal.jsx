@@ -94,10 +94,9 @@
 
 // export default ScheduleModal;
 
-
 // ScheduleModal.js
 import React from "react";
-import "../../../styles/Common/scheduleSelector.css";
+import "../../../styles/Common/ScheduleSelector.css";
 
 const ScheduleModal = ({
   show,
@@ -156,7 +155,9 @@ const ScheduleModal = ({
           Schedule Your Order
         </h2>
 
-        <p className="text-gray-300">Select start date and end date as same for single day schedule</p>
+        <p className="text-gray-300">
+          Select start date and end date as same for single day schedule
+        </p>
 
         {/* Start Date */}
         <div>
